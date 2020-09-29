@@ -1,0 +1,71 @@
+{
+  "name": "water.css",
+  "version": "2.0.0",
+  "description": "A just-add-css collection of styles to make simple websites just a little nicer.",
+  "main": "index.js",
+  "scripts": {
+    "build": "gulp style",
+    "dev": "gulp watch",
+    "lint": "standard --fix && stylelint \"src/*.css\" --fix",
+    "prepublishOnly": "yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kognise/water.css.git"
+  },
+  "keywords": [
+    "css",
+    "css-framework",
+    "simple",
+    "minimal"
+  ],
+  "author": "Kognise",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kognise/water.css/issues"
+  },
+  "homepage": "https://github.com/kognise/water.css",
+  "devDependencies": {
+    "autoprefixer": "^9.5.1",
+    "browser-sync": "^2.26.3",
+    "chalk": "^2.4.2",
+    "cssnano": "^4.1.10",
+    "gulp": "^4.0.0",
+    "gulp-bytediff": "^1.0.0",
+    "gulp-filter": "^5.1.0",
+    "gulp-flatten": "^0.4.0",
+    "gulp-postcss": "^8.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sizereport": "^1.2.1",
+    "gulp-sourcemaps": "^2.6.5",
+    "postcss-color-mod-function": "^3.0.3",
+    "postcss-css-variables": "^0.12.0",
+    "postcss-import": "^12.0.1",
+    "postcss-inline-svg": "^3.1.1",
+    "standard": "^14.3.1",
+    "stylelint": "^11.0.0",
+    "stylelint-config-standard": "^19.0.0"
+  },
+  "browserslist": {
+    "legacy": [
+      "defaults AND not android 4.4.3"
+    ],
+    "modern": [
+      "Edge > 16",
+      "Firefox > 31",
+      "Chrome > 49",
+      "Safari > 9.1",
+      "Opera > 36",
+      "ios_saf > 9.3",
+      "Android > 76",
+      "OperaMobile > 46",
+      "ChromeAndroid > 76",
+      "FirefoxAndroid > 68",
+      "UCAndroid > 12.12",
+      "Samsung > 5"
+    ]
+  },
+  "files": [
+    "dist"
+  ]
+}
