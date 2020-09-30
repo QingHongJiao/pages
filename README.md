@@ -1,6 +1,5 @@
-# pages
-静态
-<h2>Perl</h2>
+# 靑紅椒
+<h2>Home</h2>
 <ul>
     <li><a href="https://github.com/">acme teddy </a></li>
     <li><a href="https://github.com/">cheat-meta </a></li>
@@ -11,7 +10,7 @@
     <li><a href="https://github.com/"> path-finder </a></li>
 </ul>
 
-<h2>Other</h2>
+<h2>Html</h2>
 
 <ul>
     <li><a href="https://github.com/">gitflow </a></li>
@@ -21,7 +20,7 @@
 	
 </ul>
 
-<h2>Minetest</h2>
+<h2>links</h2>
 
 <ul>
     <li><a href="https://github.com/"> minetest </a></li>
