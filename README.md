@@ -1,10 +1,10 @@
 # 靑紅椒
 <h2>Home</h2>
 <ul>
-    <li><a href="https://qinghongjiao.com/">acme teddy </a></li>
+    <li><a href="https://qinghongjiao.com/">Home </a></li>
     <li><a href="https://zibaicai.com/">紫白菜 </a></li>
     <li><a href="https://baicai.js.org/">单页储存js Org </a></li>
-    <li><a href="https://zibaicai.com/archives"> 博客 </a></li>
+    <li><a href="https://qinghongjiao.com/post"> 博客 </a></li>
     <li><a href="https://zibaicai.com/links">连接</a></li>
     <li><a href="https://zibaicai.com/about">关于 </a></li>
     <li><a href="https://zibaicai.com/contact"> 联系我们 </a></li>
