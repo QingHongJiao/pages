@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="gb2312">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Keywords" content="domain,domains name,.cm">
+    <meta name="description" content="This domain is for sale!">
+    <title>welcome.cm - This domain is for sale!</title>
+    <!-- Bootstrap core CSS -->
+    <link href="static/bootstrap.css" rel="stylesheet">
+    <!-- FONT AWESOME CSS -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" />
+    <!--GOOGLE FONT -->
+    <link href="https://fonts.loli.net/css?family=Nova+Flat" rel="stylesheet" type="text/css">
+    <!-- custom CSS here -->
+    <link href="static/style.css" rel="stylesheet" />
+    <script>
+      var arr_so =['Great, So cheap!','Wow, awesome!'];
+      var so_index = Math.floor((Math.random()*arr_so.length));
+      var spoken = arr_so[so_index];
+   </script>
+</head>
+<body>
+  <div class="cus-main">
+    <div class="content">
+      <div class="text-center">
+          <h1>welcome.cm</h1>
+          <h5>You're worth it about this domain name!</h5>
+          <p>No less than <span class="badge">&pound;</span></p>
+          <span id="offer-price"></span>
+          <h2><script>document.write(spoken);</script></h2>
+          <!--<h2>Great, So cheap!</h2>-->
+        </div>
+        <div class="col-md-8 col-md-offset-2">
+          <h3><i class="fa fa-lightbulb-o fa-5x"></i></h3>
+          <a class="btn btn-new" href="#" role="button" data-toggle="modal" data-target="#myModal" id="modalBtn">MORE DOMAINS</a>
+          <br/><br/>
+          <h5>You can contact us by the following way.</h5>
+          <!-- <i class="fa fa-qq"></i><a href="http://wpa.qq.com/msgrd?v=3&amp;uin=1008610000&amp;site=qq&amp;menu=yes" target="_blank" title="QQ online">&nbsp;1008610000</a>  &nbsp;&nbsp;  -->
+          <i class="fa fa-envelope"></i><a href="mailto:abc@abc.com" title="email" target="_blank">&nbsp;abc@abc.com</a>  &nbsp;&nbsp; 
+          <i class="fa fa-phone"></i><a href="tel:123456789100" title="Tel us" target="_blank">&nbsp;123456789(demo)</a>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title" id="myModalLabel">Creative domains</h4>
+    </div>
+    <div class="modal-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Domain Name</th>
+            <th>Description</th>
+            <th>Price(No Less Than) &pound;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>ball.cm</td>
+            <td>basketball</td>
+            <td>288</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>party.cm</td>
+            <td>Birthday party</td>
+            <td>388</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>woman.cm</td>
+            <td>Woman love man</td>
+            <td>388</td>
+          </tr>
+          <tr>
+            <th scope="row">4</th>
+            <td>rome.cm</td>
+            <td>You know rome</td>
+            <td>288</td>
+          </tr>
+          <tr>
+            <th scope="row">5</th>
+            <td>sdk.cm</td>
+            <td>SDK</td>
+            <td>688</td>
+          </tr>
+          <tr>
+            <th scope="row">6</th>
+            <td>man.cm</td>
+            <td>Man love woman</td>
+            <td>388</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+       <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
+       <small class="tips">Welcome to bargaining ^_^</small>
+    </div>
+  </div>
+  </div>
+</div>
+    <div class="hidden"><script type="text/javascript" src="https://s4.cnzz.com/1"></script></div>
+    <!--Core JavaScript file  -->
+    <script src="static/jquery-1.10.2.js"></script>
+    <!--bootstrap JavaScript file  -->
+    <script src="static/bootstrap.js"></script>
+     <!--Count Number JavaScript file  -->
+    <script src="static/countUp.js"></script>
+    <!--Custom JavaScript file  -->
+    <script src="static/custom.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        var $m_btn = $('#modalBtn');
+        var $modal = $('#myModal');
+        $m_btn.on('click', function(){
+          $modal.modal({backdrop: 'static'});
+        });
+        $modal.on('show.bs.modal', function(){
+          var $this = $(this);
+          var $modal_dialog = $this.find('.modal-dialog');
+          $this.css('display', 'block');
+          $modal_dialog.css({'margin-top': Math.max(0, ($(window).height() - $modal_dialog.height()) / 2) });
+        });
+        
+      });
+    </script>
+</body>
+</html>
