@@ -1,4 +1,4 @@
-# 靑紅椒
+# 静态单页展示连接（建设中）
 <h2>Home</h2>
 <ul>
     <li><a href="https://qinghongjiao.com/">Home </a></li>
