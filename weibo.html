@@ -119,19 +119,6 @@
 
 
 
-<div class="post" id="post_div">
-			<div class="post_avatar">
-				<a href="/microblog.username">
-					<img src="https://cdn.jsdelivr.net/gh/qinghongjiao/cdn/googlelogo/contacts.png" width="48" height="48" />
-				</a>
-			</div>
-			<div class="post_content">
-				<div class="post_username">名字
-					<a href="/microblog.username">
-。。。。。。。正文。还是觉得鸡蛋面快点快点宽带看到那些胡行吧行吧相机刺激打不死他和。。。。。。。。。。</a>
-				</div>
-
-
 
   
 <section class="category" aria-labelledby="apps">
@@ -169,38 +156,6 @@
 
 
 
-<script id="posts-template" type="text/x-handlebars-template">
-	
-	
-	{{#each this}}
-		<div class="post" id="post_div_{{id}}">
-			<div class="post_avatar">
-				<a href="/{{author._microblog.username}}">
-					<img src="/photos/96/{{author.avatar}}" width="48" height="48" />
-				</a>
-			</div>
-			<div class="post_content">
-				<div class="post_username">
-					<a href="/{{author._microblog.username}}">{{author._microblog.username}}</a>
-				</div>
-				<div class="post_text">
-					{{{content_html}}}
-				</div>
-				<div class="post_options">
-					<div class="post_time"><a href="{{url}}">{{_microblog.date_relative}}</a></div>
-					
-				</div>
-				
-				
-			</div>
-		</div>
-	{{/each}}
-</script>
-
-<img id="progress_spinner" src="https://micro.blog//images/progress_spinner.gif" width="30" height="30" alt="图片" />
-
-<div class="posts">
-</div>
 
 
 	</div>
