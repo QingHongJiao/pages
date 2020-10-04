@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	
+	<title>
+		
+			Micro.blog - @me
+		
+	</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/codemirror.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://micro.blog/css/main.css">
+	<link rel="shortcut icon" href="/images/icons/favicon_32.png" type="image/x-icon" />
+	<link rel="webmention" href="https://micro.blog/webmention" />
+	<link rel="subscribe" href="https://micro.blog/users/follow" />
+	
+		<link rel="alternate" type="application/json" title="JSON Feed" href="https://micro.blog/posts/me" />
+	
+	
+</head>
+<body>
+
+
+	<style>
+		nav {
+			float: right;
+			line-height: 56px;
+			padding-top: 4px;
+		}
+		
+		nav a {
+			padding-right: 6px;
+		}
+		
+		.container {
+			width: 70%;
+		}
+
+		.splash_signup {
+			display: none;
+			margin-left: 10px;
+			vertical-align: middle;
+		}
+
+		.splash_startbutton {
+			background-color: #FEE199;
+			border-color: #FDB52B;
+			color: black;
+		}
+		
+		.splash_startbutton:hover {
+			background-color: #FDC75C;
+			border-color: #FDB52B;
+			color: black;
+		}
+						
+		@media screen and (max-width: 600px) {
+			nav {
+				float: none;
+				line-height: 22px;				
+				padding-bottom: 10px;
+			}
+			
+			.container {
+				width: 90%;
+			}
+
+			.splash_signup {
+				margin-left: 0px;
+				padding-bottom: 10px;
+			}
+		}
+	</style>
+
+	<div class="container">
+		<header>
+			<h1 class="header_logo"><a href="/">Micro.blog</a></h1>
+
+			<div class="splash_signup">
+				
+					<p><a href="/register" class="btn btn-default splash_startbutton">Sign up now: free 10-day trial</a></p>
+				
+			</div>
+					
+			<nav>
+				<a href="/signin">Sign In</a>
+				<a href="/discover">Discover</a>
+				<a href="/pricing">Pricing</a>
+				<a href="https://help.micro.blog/">Help</a>
+			</nav>
+		</header>
+		
+		<div class="alert alert-warning user_options_alert" style="display: none;">
+	@me has been reported. Thank you.
+</div>
+
+<div class="alert alert-info" role="alert" style="display: block;" id="timeline_info">
+	<b>Mike Evans</b> 
+	
+	<br />
+	@me
+	<br />			
+	<a href="https://me.micro.blog/">https://memicroblog/  微博</a>
+
+	
+
+	
+
+	
+</div>
+
+
+<form>
+	<input type="hidden" value="/posts/me" id="fetch_path" />
+</form>
+
+<script id="posts-template" type="text/x-handlebars-template">
+	
+	
+	{{#each this}}
+		<div class="post" id="post_div_{{id}}">
+			<div class="post_avatar">
+				<a href="/{{author._microblog.username}}">
+					<img src="/photos/96/{{author.avatar}}" width="48" height="48" />
+				</a>
+			</div>
+			<div class="post_content">
+				<div class="post_username">
+					<a href="/{{author._microblog.username}}">{{author._microblog.username}}</a>
+				</div>
+				<div class="post_text">
+					{{{content_html}}}
+				</div>
+				<div class="post_options">
+					<div class="post_time"><a href="{{url}}">{{_microblog.date_relative}}</a></div>
+					
+				</div>
+				
+				<div class="post_replybox" id="reply_div_{{id}}" style="display: none;">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<textarea class="form-control post_textarea" rows="3"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12" style="text-align: right;">
+								<button type="submit" class="btn btn-default replybox_button" onClick="cancelReply({{id}}); return false;">Cancel</button>
+								<button type="submit" id="reply_button_{{id}}" class="btn btn-default replybox_button" onClick="sendReply({{id}}); return false;">Post</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	{{/each}}
+</script>
+
+<img id="progress_spinner" src="/images/progress_spinner.gif" width="30" height="30" alt="Progress spinner" />
+
+<div class="posts">
+</div>
+
+
+	</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/mode/markdown/markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.payment/3.0.0/jquery.payment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+<script src="https://micro.blog/css/js/microblog.js?88"></script>
+
+</body>
+</html>
