@@ -117,7 +117,7 @@
 	<input type="hidden" value="/posts/me" id="fetch_path" />
 </form>
 
-<div class="post" id="post_div_{{id}}">
+<div class="post" id="post_div">
 			<div class="post_avatar">
 				<a href="/microblog.username">
 					<img src="https://cdn.jsdelivr.net/gh/qinghongjiao/cdn/googlelogo/contacts.png" width="48" height="48" />
@@ -125,7 +125,8 @@
 			</div>
 			<div class="post_content">
 				<div class="post_username">
-					<a href="/microblog.username">{{author._microblog.username}}</a>
+					<a href="/microblog.username">
+。。。。。。。正文。。。。。。。。。。。</a>
 				</div>
 
 
@@ -195,9 +196,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
 <script src="https://micro.blog/css/js/microblog.js?88"></script>
 
+<footer class="site-footer">
 
-<footer class="footer">
-  <address class="footer__address">Still have questions? Email <a href="mailto:help@micro.blog">help@micro.blog</a>.</address>
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-3">
+        <p class="text">Follow <a href="https://micro.blog/me">@me on Micro.blog</a>.</p>
+      </div>
+    </div>
+
+  </div>
+
 </footer>
+
 </body>
 </html>
