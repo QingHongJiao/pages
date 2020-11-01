@@ -52,7 +52,7 @@
 	}
 }
 </head>
-<body>
+<<body>
 <div class="container">
 	<div class="logo"></div>
 	<div class="button" data-app-btn></div>
@@ -60,37 +60,54 @@
 <div class="app-form-mask hide">
 	<div id="app-form" class="app-form">
 		<div class="close-btn"></div>
-		<p class="title">联系我们</p>
-		
-<p>添加以下企业微信获取优先会员资格</p>
-<p>添加以下企业微信获取优先会员资格</p>
-<p>添加以下企业微信获取优先会员资格</p>
-
-<ul>   
-        <li>
-            <p>引导页面文字</p>
-        </li>
-    
-        <li>
-            <h2>紫白菜，紫百财</h2>
-        </li>
-        
-        <li>
-            <a href="/congming.html"><aside class="dates">青红椒</aside></a>
-            <a href="/congming.html">青红椒内容待定 <h2></h2></a>
-        </li>
-    
-        <li>   您的每一笔赞助都将被我们用来用于网站日常维护费用。</li>
-		<br>
-	<li>	支付宝收款码：<a href="https://i.loli.net/2020/10/10/5MPD3Y7A4.png" target="_blank">点我查看</a></li>
-		<br>
-	<li>	微信赞赏码：<a href="https://i.loli.net/2020/10/10/DLjdTvYOXyk.png" target="_blank">点我查看</a></li>
-    
-</ul>
-
-    <div class="vip-qrcode">
-    <img src="https://5b0988e595225.cdn.sohucs.com/q_70,c_zoom,w_640/images/20181224/21f50463649147a3a38337786b0c70c9.webp" />
-    </div>
+		<p class="title">请填写并提交您的相关信息，</p>
+		<!--<p>添加以下企业微信获取优先会员资格</p>
+        <div class="vip-qrcode">
+            <img src="http://parking.taoming.com/images/vip_clean.jpg" />
+        </div>-->
+		<ul>
+			<li class="clearfix">
+				<div class="label"><label for="name">姓名：</label></div>
+				<div class="field"><input name="name" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix">
+				<div class="label"><label for="phone_number">手机号：</label></div>
+				<div class="field"><input name="phone_number" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix">
+				<div class="label"><label for="email">电子邮件：</label></div>
+				<div class="field"><input name="email" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix">
+				<div class="label"><label for="wechat_id">微信号：</label></div>
+				<div class="field"><input name="wechat_id" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix" style="height: 175px;">
+				<div class="label"><label for="remark">主题：</label></div>
+				<div class="field"><textarea name="remark" class="input-text" type="text" placeholder="请填下您的详细需求,以便我们和您及时联系。"></textarea></div>
+			</li>
+            <li class="clearfix">
+                <div class="label"></div>
+                <div class="field">
+                    <input type="checkbox" name="agree" checked="checked" />
+                    我已阅读并同意<a href="/privacy" target="_blank">隐私政策</a>
+                </div>
+            </li>
+			<li class="clearfix">
+				<div class="label hide-small"><input type="hidden" name="siteid" value="117" /></div>
+				<div class="field"><button type="button" class="input-btn" data-submit>提交信息</button></div>
+			</li>
+		</ul>
+	</div>
+    <div id="app-result" class="app-form hide">
+		<div class="close-btn"></div>
+        <p class="title">提交成功，感谢您的申请！</p>
+        <p>请添加以下微信与我们联系</p>
+        <div class="wechat-qrcode">
+            <img src="http://parking.taoming.com/images/wechat_qrcode.jpg" />
+        </div>
+        <p>扫描以上二维码</p>
+        <p>或添加微信号 18520056026 </p>
     </div>
 </div>
 
