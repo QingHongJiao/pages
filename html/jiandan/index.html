@@ -51,19 +51,64 @@
 	}
 }
 </head>
+
 <body>
 <div class="container">
 	<div class="logo"></div>
 	<div class="button" data-app-btn></div>
 	</div>
-
 <div class="app-form-mask hide">
 	<div id="app-form" class="app-form">
 		<div class="close-btn"></div>
-		<p class="title">关于我们</p>
-		<p>添加以下企业微信获取优先会员资格</p>
-        
- </div> 
+		<p class="title">请填写并提交您的相关信息，</p>
+		<!--<p>添加以下企业微信获取优先会员资格</p>
+        <div class="vip-qrcode">
+            <img src="http://parking.taoming.com/images/vip_clean.jpg" />
+        </div>-->
+		<ul>
+			<li class="clearfix">
+				<div class="label"><label for="name">姓名：</label></div>
+				<div class="field"><input name="name" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix">
+				<div class="label"><label for="phone_number">手机号：</label></div>
+				<div class="field"><input name="phone_number" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix">
+				<div class="label"><label for="email">电子邮件：</label></div>
+				<div class="field"><input name="email" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix">
+				<div class="label"><label for="wechat_id">微信号：</label></div>
+				<div class="field"><input name="wechat_id" class="input-text" type="text" placeholder="" /></div>
+			</li>
+			<li class="clearfix" style="height: 175px;">
+				<div class="label"><label for="remark">主题：</label></div>
+				<div class="field"><textarea name="remark" class="input-text" type="text" placeholder="请填下您的详细需求,以便我们和您及时联系。"></textarea></div>
+			</li>
+            <li class="clearfix">
+                <div class="label"></div>
+                <div class="field">
+                    <input type="checkbox" name="agree" checked="checked" />
+                    我已阅读并同意<a href="/privacy" target="_blank">隐私政策</a>
+                </div>
+            </li>
+			<li class="clearfix">
+				<div class="label hide-small"><input type="hidden" name="siteid" value="117" /></div>
+				<div class="field"><button type="button" class="input-btn" data-submit>提交信息</button></div>
+			</li>
+		</ul>
+	</div>
+    <div id="app-result" class="app-form hide">
+		<div class="close-btn"></div>
+        <p class="title">提交成功，感谢您的申请！</p>
+        <p>请添加以下微信与我们联系</p>
+        <div class="wechat-qrcode">
+            <img src="http://parking.taoming.com/images/wechat_qrcode.jpg" />
+        </div>
+        <p>扫描以上二维码</p>
+        <p>或添加微信号 18520056026 </p>
+    </div>
 </div>
 
 <script type="text/javascript">
