@@ -1,0 +1,496 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" CONTENT="女慕,女子,思慕,贞洁,贞妇,洁女,婚纱,礼服,旅拍,摄影,新娘,结婚,婚礼,新婚" />
+<meta name="description" content="品牌故事【来源】千字文【作者】周兴嗣【朝代】南北朝【原文】女慕贞洁，男效才良。【译文】女子要思慕那些为人称道的贞妇洁女，男子要效法有德有才的贤人。" />
+<link rel="icon" type="image/svg" href="img/favicon.svg"/>
+<style type="text/css"><!--@import url(css/style.css);--></style>
+<title>女慕 - 婚纱环球旅拍</title>
+</head>
+
+<body>
+<canvas></canvas>
+<script>
+var _createClass = function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};}();function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}
+
+var canvas = document.getElementsByTagName('canvas')[0];
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+
+var config = {
+    TEXTURE_DOWNSAMPLE: 1,
+    DENSITY_DISSIPATION: 0.98,
+    VELOCITY_DISSIPATION: 0.99,
+    PRESSURE_DISSIPATION: 0.8,
+    PRESSURE_ITERATIONS: 25,
+    CURL: 30,
+    SPLAT_RADIUS: 0.005 };
+
+var pointers = [];
+var splatStack = [];var _getWebGLContext =
+
+getWebGLContext(canvas),gl = _getWebGLContext.gl,ext = _getWebGLContext.ext;
+
+function getWebGLContext(canvas) {
+    var params = { alpha: false, depth: false, stencil: false, antialias: false };
+
+    var gl = canvas.getContext('webgl2', params);
+    var isWebGL2 = !!gl;
+    if (!isWebGL2)
+    gl = canvas.getContext('webgl', params) || canvas.getContext('experimental-webgl', params);
+
+    var halfFloat = void 0;
+    var supportLinearFiltering = void 0;
+    if (isWebGL2) {
+        gl.getExtension('EXT_color_buffer_float');
+        supportLinearFiltering = gl.getExtension('OES_texture_float_linear');
+    } else {
+        halfFloat = gl.getExtension('OES_texture_half_float');
+        supportLinearFiltering = gl.getExtension('OES_texture_half_float_linear');
+    }
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    var halfFloatTexType = isWebGL2 ? gl.HALF_FLOAT : halfFloat.HALF_FLOAT_OES;
+    var formatRGBA = void 0;
+    var formatRG = void 0;
+    var formatR = void 0;
+
+    if (isWebGL2)
+    {
+        formatRGBA = getSupportedFormat(gl, gl.RGBA16F, gl.RGBA, halfFloatTexType);
+        formatRG = getSupportedFormat(gl, gl.RG16F, gl.RG, halfFloatTexType);
+        formatR = getSupportedFormat(gl, gl.R16F, gl.RED, halfFloatTexType);
+    } else
+
+    {
+        formatRGBA = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+        formatRG = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+        formatR = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+    }
+
+    return {
+        gl: gl,
+        ext: {
+            formatRGBA: formatRGBA,
+            formatRG: formatRG,
+            formatR: formatR,
+            halfFloatTexType: halfFloatTexType,
+            supportLinearFiltering: supportLinearFiltering } };
+}
+
+function getSupportedFormat(gl, internalFormat, format, type) {
+    if (!supportRenderTextureFormat(gl, internalFormat, format, type))
+    {
+        switch (internalFormat) {
+
+            case gl.R16F:
+                return getSupportedFormat(gl, gl.RG16F, gl.RG, type);
+            case gl.RG16F:
+                return getSupportedFormat(gl, gl.RGBA16F, gl.RGBA, type);
+            default:
+                return null;}
+
+    }
+
+    return {
+        internalFormat: internalFormat,
+        format: format };
+
+}
+
+function supportRenderTextureFormat(gl, internalFormat, format, type) {
+    var texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, 4, 4, 0, format, type, null);
+
+    var fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+    var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    if (status != gl.FRAMEBUFFER_COMPLETE)
+    return false;
+    return true;
+}
+
+function pointerPrototype() {
+    this.id = -1;
+    this.x = 0;
+    this.y = 0;
+    this.dx = 0;
+    this.dy = 0;
+    this.down = false;
+    this.moved = false;
+    this.color = [30, 0, 300];
+}
+
+pointers.push(new pointerPrototype());var
+
+GLProgram = function () {
+    function GLProgram(vertexShader, fragmentShader) {_classCallCheck(this, GLProgram);
+        this.uniforms = {};
+        this.program = gl.createProgram();
+
+        gl.attachShader(this.program, vertexShader);
+        gl.attachShader(this.program, fragmentShader);
+        gl.linkProgram(this.program);
+
+        if (!gl.getProgramParameter(this.program, gl.LINK_STATUS))
+        throw gl.getProgramInfoLog(this.program);
+
+        var uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
+        for (var i = 0; i < uniformCount; i++) {
+            var uniformName = gl.getActiveUniform(this.program, i).name;
+            this.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName);
+        }
+    }_createClass(GLProgram, [{ key: 'bind', value: function bind()
+
+        {
+            gl.useProgram(this.program);
+        } }]);return GLProgram;}();
+
+function compileShader(type, source) {
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+    throw gl.getShaderInfoLog(shader);
+
+    return shader;
+};
+
+var baseVertexShader = compileShader(gl.VERTEX_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    attribute vec2 aPosition;\n    varying vec2 vUv;\n    varying vec2 vL;\n    varying vec2 vR;\n    varying vec2 vT;\n    varying vec2 vB;\n    uniform vec2 texelSize;\n\n    void main () {\n        vUv = aPosition * 0.5 + 0.5;\n        vL = vUv - vec2(texelSize.x, 0.0);\n        vR = vUv + vec2(texelSize.x, 0.0);\n        vT = vUv + vec2(0.0, texelSize.y);\n        vB = vUv - vec2(0.0, texelSize.y);\n        gl_Position = vec4(aPosition, 0.0, 1.0);\n    }\n');
+
+var clearShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    uniform sampler2D uTexture;\n    uniform float value;\n\n    void main () {\n        gl_FragColor = value * texture2D(uTexture, vUv);\n    }\n');
+
+var displayShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    uniform sampler2D uTexture;\n\n    void main () {\n        gl_FragColor = texture2D(uTexture, vUv);\n    }\n');
+
+var splatShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    uniform sampler2D uTarget;\n    uniform float aspectRatio;\n    uniform vec3 color;\n    uniform vec2 point;\n    uniform float radius;\n\n    void main () {\n        vec2 p = vUv - point.xy;\n        p.x *= aspectRatio;\n        vec3 splat = exp(-dot(p, p) / radius) * color;\n        vec3 base = texture2D(uTarget, vUv).xyz;\n        gl_FragColor = vec4(base + splat, 1.0);\n    }\n');
+
+var advectionManualFilteringShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    uniform sampler2D uVelocity;\n    uniform sampler2D uSource;\n    uniform vec2 texelSize;\n    uniform float dt;\n    uniform float dissipation;\n\n    vec4 bilerp (in sampler2D sam, in vec2 p) {\n        vec4 st;\n        st.xy = floor(p - 0.5) + 0.5;\n        st.zw = st.xy + 1.0;\n        vec4 uv = st * texelSize.xyxy;\n        vec4 a = texture2D(sam, uv.xy);\n        vec4 b = texture2D(sam, uv.zy);\n        vec4 c = texture2D(sam, uv.xw);\n        vec4 d = texture2D(sam, uv.zw);\n        vec2 f = p - st.xy;\n        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);\n    }\n\n    void main () {\n        vec2 coord = gl_FragCoord.xy - dt * texture2D(uVelocity, vUv).xy;\n        gl_FragColor = dissipation * bilerp(uSource, coord);\n        gl_FragColor.a = 1.0;\n    }\n');
+
+var advectionShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    uniform sampler2D uVelocity;\n    uniform sampler2D uSource;\n    uniform vec2 texelSize;\n    uniform float dt;\n    uniform float dissipation;\n\n    void main () {\n        vec2 coord = vUv - dt * texture2D(uVelocity, vUv).xy * texelSize;\n        gl_FragColor = dissipation * texture2D(uSource, coord);\n        gl_FragColor.a = 1.0;\n    }\n');
+
+var divergenceShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    varying vec2 vL;\n    varying vec2 vR;\n    varying vec2 vT;\n    varying vec2 vB;\n    uniform sampler2D uVelocity;\n\n    vec2 sampleVelocity (in vec2 uv) {\n        vec2 multiplier = vec2(1.0, 1.0);\n        if (uv.x < 0.0) { uv.x = 0.0; multiplier.x = -1.0; }\n        if (uv.x > 1.0) { uv.x = 1.0; multiplier.x = -1.0; }\n        if (uv.y < 0.0) { uv.y = 0.0; multiplier.y = -1.0; }\n        if (uv.y > 1.0) { uv.y = 1.0; multiplier.y = -1.0; }\n        return multiplier * texture2D(uVelocity, uv).xy;\n    }\n\n    void main () {\n        float L = sampleVelocity(vL).x;\n        float R = sampleVelocity(vR).x;\n        float T = sampleVelocity(vT).y;\n        float B = sampleVelocity(vB).y;\n        float div = 0.5 * (R - L + T - B);\n        gl_FragColor = vec4(div, 0.0, 0.0, 1.0);\n    }\n');
+
+var curlShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    varying vec2 vL;\n    varying vec2 vR;\n    varying vec2 vT;\n    varying vec2 vB;\n    uniform sampler2D uVelocity;\n\n    void main () {\n        float L = texture2D(uVelocity, vL).y;\n        float R = texture2D(uVelocity, vR).y;\n        float T = texture2D(uVelocity, vT).x;\n        float B = texture2D(uVelocity, vB).x;\n        float vorticity = R - L - T + B;\n        gl_FragColor = vec4(vorticity, 0.0, 0.0, 1.0);\n    }\n');
+
+var vorticityShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    varying vec2 vT;\n    varying vec2 vB;\n    uniform sampler2D uVelocity;\n    uniform sampler2D uCurl;\n    uniform float curl;\n    uniform float dt;\n\n    void main () {\n        float T = texture2D(uCurl, vT).x;\n        float B = texture2D(uCurl, vB).x;\n        float C = texture2D(uCurl, vUv).x;\n        vec2 force = vec2(abs(T) - abs(B), 0.0);\n        force *= 1.0 / length(force + 0.00001) * curl * C;\n        vec2 vel = texture2D(uVelocity, vUv).xy;\n        gl_FragColor = vec4(vel + force * dt, 0.0, 1.0);\n    }\n');
+
+var pressureShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    varying vec2 vL;\n    varying vec2 vR;\n    varying vec2 vT;\n    varying vec2 vB;\n    uniform sampler2D uPressure;\n    uniform sampler2D uDivergence;\n\n    vec2 boundary (in vec2 uv) {\n        uv = min(max(uv, 0.0), 1.0);\n        return uv;\n    }\n\n    void main () {\n        float L = texture2D(uPressure, boundary(vL)).x;\n        float R = texture2D(uPressure, boundary(vR)).x;\n        float T = texture2D(uPressure, boundary(vT)).x;\n        float B = texture2D(uPressure, boundary(vB)).x;\n        float C = texture2D(uPressure, vUv).x;\n        float divergence = texture2D(uDivergence, vUv).x;\n        float pressure = (L + R + B + T - divergence) * 0.25;\n        gl_FragColor = vec4(pressure, 0.0, 0.0, 1.0);\n    }\n');
+
+var gradientSubtractShader = compileShader(gl.FRAGMENT_SHADER, '\n    precision highp float;\n    precision mediump sampler2D;\n\n    varying vec2 vUv;\n    varying vec2 vL;\n    varying vec2 vR;\n    varying vec2 vT;\n    varying vec2 vB;\n    uniform sampler2D uPressure;\n    uniform sampler2D uVelocity;\n\n    vec2 boundary (in vec2 uv) {\n        uv = min(max(uv, 0.0), 1.0);\n        return uv;\n    }\n\n    void main () {\n        float L = texture2D(uPressure, boundary(vL)).x;\n        float R = texture2D(uPressure, boundary(vR)).x;\n        float T = texture2D(uPressure, boundary(vT)).x;\n        float B = texture2D(uPressure, boundary(vB)).x;\n        vec2 velocity = texture2D(uVelocity, vUv).xy;\n        velocity.xy -= vec2(R - L, T - B);\n        gl_FragColor = vec4(velocity, 0.0, 1.0);\n    }\n');
+
+var textureWidth = void 0;
+var textureHeight = void 0;
+var density = void 0;
+var velocity = void 0;
+var divergence = void 0;
+var curl = void 0;
+var pressure = void 0;
+initFramebuffers();
+
+var clearProgram = new GLProgram(baseVertexShader, clearShader);
+var displayProgram = new GLProgram(baseVertexShader, displayShader);
+var splatProgram = new GLProgram(baseVertexShader, splatShader);
+var advectionProgram = new GLProgram(baseVertexShader, ext.supportLinearFiltering ? advectionShader : advectionManualFilteringShader);
+var divergenceProgram = new GLProgram(baseVertexShader, divergenceShader);
+var curlProgram = new GLProgram(baseVertexShader, curlShader);
+var vorticityProgram = new GLProgram(baseVertexShader, vorticityShader);
+var pressureProgram = new GLProgram(baseVertexShader, pressureShader);
+var gradienSubtractProgram = new GLProgram(baseVertexShader, gradientSubtractShader);
+
+function initFramebuffers() {
+    textureWidth = gl.drawingBufferWidth >> config.TEXTURE_DOWNSAMPLE;
+    textureHeight = gl.drawingBufferHeight >> config.TEXTURE_DOWNSAMPLE;
+
+    var texType = ext.halfFloatTexType;
+    var rgba = ext.formatRGBA;
+    var rg = ext.formatRG;
+    var r = ext.formatR;
+
+    density = createDoubleFBO(2, textureWidth, textureHeight, rgba.internalFormat, rgba.format, texType, ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST);
+    velocity = createDoubleFBO(0, textureWidth, textureHeight, rg.internalFormat, rg.format, texType, ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST);
+    divergence = createFBO(4, textureWidth, textureHeight, r.internalFormat, r.format, texType, gl.NEAREST);
+    curl = createFBO(5, textureWidth, textureHeight, r.internalFormat, r.format, texType, gl.NEAREST);
+    pressure = createDoubleFBO(6, textureWidth, textureHeight, r.internalFormat, r.format, texType, gl.NEAREST);
+}
+
+function createFBO(texId, w, h, internalFormat, format, type, param) {
+    gl.activeTexture(gl.TEXTURE0 + texId);
+    var texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
+
+    var fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    gl.viewport(0, 0, w, h);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    return [texture, fbo, texId];
+}
+
+function createDoubleFBO(texId, w, h, internalFormat, format, type, param) {
+    var fbo1 = createFBO(texId, w, h, internalFormat, format, type, param);
+    var fbo2 = createFBO(texId + 1, w, h, internalFormat, format, type, param);
+
+    return {
+        get read() {
+            return fbo1;
+        },
+        get write() {
+            return fbo2;
+        },
+        swap: function swap() {
+            var temp = fbo1;
+            fbo1 = fbo2;
+            fbo2 = temp;
+        } };
+}
+
+var blit = function () {
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(0);
+
+    return function (destination) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, destination);
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+    };
+}();
+
+var lastTime = Date.now();
+multipleSplats(parseInt(Math.random() * 20) + 5);
+update();
+
+function update() {
+    resizeCanvas();
+
+    var dt = Math.min((Date.now() - lastTime) / 1000, 0.016);
+    lastTime = Date.now();
+
+    gl.viewport(0, 0, textureWidth, textureHeight);
+
+    if (splatStack.length > 0)
+    multipleSplats(splatStack.pop());
+
+    advectionProgram.bind();
+    gl.uniform2f(advectionProgram.uniforms.texelSize, 1.0 / textureWidth, 1.0 / textureHeight);
+    gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
+    gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read[2]);
+    gl.uniform1f(advectionProgram.uniforms.dt, dt);
+    gl.uniform1f(advectionProgram.uniforms.dissipation, config.VELOCITY_DISSIPATION);
+    blit(velocity.write[1]);
+    velocity.swap();
+
+    gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
+    gl.uniform1i(advectionProgram.uniforms.uSource, density.read[2]);
+    gl.uniform1f(advectionProgram.uniforms.dissipation, config.DENSITY_DISSIPATION);
+    blit(density.write[1]);
+    density.swap();
+
+    for (var i = 0; i < pointers.length; i++) {
+        var pointer = pointers[i];
+        if (pointer.moved) {
+            splat(pointer.x, pointer.y, pointer.dx, pointer.dy, pointer.color);
+            pointer.moved = false;
+        }
+    }
+
+    curlProgram.bind();
+    gl.uniform2f(curlProgram.uniforms.texelSize, 1.0 / textureWidth, 1.0 / textureHeight);
+    gl.uniform1i(curlProgram.uniforms.uVelocity, velocity.read[2]);
+    blit(curl[1]);
+
+    vorticityProgram.bind();
+    gl.uniform2f(vorticityProgram.uniforms.texelSize, 1.0 / textureWidth, 1.0 / textureHeight);
+    gl.uniform1i(vorticityProgram.uniforms.uVelocity, velocity.read[2]);
+    gl.uniform1i(vorticityProgram.uniforms.uCurl, curl[2]);
+    gl.uniform1f(vorticityProgram.uniforms.curl, config.CURL);
+    gl.uniform1f(vorticityProgram.uniforms.dt, dt);
+    blit(velocity.write[1]);
+    velocity.swap();
+
+    divergenceProgram.bind();
+    gl.uniform2f(divergenceProgram.uniforms.texelSize, 1.0 / textureWidth, 1.0 / textureHeight);
+    gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read[2]);
+    blit(divergence[1]);
+
+    clearProgram.bind();
+    var pressureTexId = pressure.read[2];
+    gl.activeTexture(gl.TEXTURE0 + pressureTexId);
+    gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+    gl.uniform1i(clearProgram.uniforms.uTexture, pressureTexId);
+    gl.uniform1f(clearProgram.uniforms.value, config.PRESSURE_DISSIPATION);
+    blit(pressure.write[1]);
+    pressure.swap();
+
+    pressureProgram.bind();
+    gl.uniform2f(pressureProgram.uniforms.texelSize, 1.0 / textureWidth, 1.0 / textureHeight);
+    gl.uniform1i(pressureProgram.uniforms.uDivergence, divergence[2]);
+    pressureTexId = pressure.read[2];
+    gl.uniform1i(pressureProgram.uniforms.uPressure, pressureTexId);
+    gl.activeTexture(gl.TEXTURE0 + pressureTexId);
+    for (var _i = 0; _i < config.PRESSURE_ITERATIONS; _i++) {
+        gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+        blit(pressure.write[1]);
+        pressure.swap();
+    }
+
+    gradienSubtractProgram.bind();
+    gl.uniform2f(gradienSubtractProgram.uniforms.texelSize, 1.0 / textureWidth, 1.0 / textureHeight);
+    gl.uniform1i(gradienSubtractProgram.uniforms.uPressure, pressure.read[2]);
+    gl.uniform1i(gradienSubtractProgram.uniforms.uVelocity, velocity.read[2]);
+    blit(velocity.write[1]);
+    velocity.swap();
+
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    displayProgram.bind();
+    gl.uniform1i(displayProgram.uniforms.uTexture, density.read[2]);
+    blit(null);
+
+    requestAnimationFrame(update);
+}
+
+function splat(x, y, dx, dy, color) {
+    splatProgram.bind();
+    gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read[2]);
+    gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
+    gl.uniform2f(splatProgram.uniforms.point, x / canvas.width, 1.0 - y / canvas.height);
+    gl.uniform3f(splatProgram.uniforms.color, dx, -dy, 1.0);
+    gl.uniform1f(splatProgram.uniforms.radius, config.SPLAT_RADIUS);
+    blit(velocity.write[1]);
+    velocity.swap();
+
+    gl.uniform1i(splatProgram.uniforms.uTarget, density.read[2]);
+    gl.uniform3f(splatProgram.uniforms.color, color[0] * 0.3, color[1] * 0.3, color[2] * 0.3);
+    blit(density.write[1]);
+    density.swap();
+}
+
+function multipleSplats(amount) {
+    for (var i = 0; i < amount; i++) {
+        var color = [Math.random() * 10, Math.random() * 10, Math.random() * 10];
+        var x = canvas.width * Math.random();
+        var y = canvas.height * Math.random();
+        var dx = 1000 * (Math.random() - 0.5);
+        var dy = 1000 * (Math.random() - 0.5);
+        splat(x, y, dx, dy, color);
+    }
+}
+
+function resizeCanvas() {
+    if (canvas.width != canvas.clientWidth || canvas.height != canvas.clientHeight) {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        initFramebuffers();
+    }
+}
+
+canvas.addEventListener('mousemove', function (e) {
+    pointers[0].moved = pointers[0].down;
+    pointers[0].dx = (e.offsetX - pointers[0].x) * 10.0;
+    pointers[0].dy = (e.offsetY - pointers[0].y) * 10.0;
+    pointers[0].x = e.offsetX;
+    pointers[0].y = e.offsetY;
+});
+
+canvas.addEventListener('touchmove', function (e) {
+    e.preventDefault();
+    var touches = e.targetTouches;
+    for (var i = 0; i < touches.length; i++) {
+        var pointer = pointers[i];
+        pointer.moved = pointer.down;
+        pointer.dx = (touches[i].pageX - pointer.x) * 10.0;
+        pointer.dy = (touches[i].pageY - pointer.y) * 10.0;
+        pointer.x = touches[i].pageX;
+        pointer.y = touches[i].pageY;
+    }
+}, false);
+
+canvas.addEventListener('mousedown', function () {
+    pointers[0].down = true;
+    pointers[0].color = [Math.random() + 0.2, Math.random() + 0.2, Math.random() + 0.2];
+});
+
+canvas.addEventListener('touchstart', function (e) {
+    e.preventDefault();
+    var touches = e.targetTouches;
+    for (var i = 0; i < touches.length; i++) {
+        if (i >= pointers.length)
+        pointers.push(new pointerPrototype());
+
+        pointers[i].id = touches[i].identifier;
+        pointers[i].down = true;
+        pointers[i].x = touches[i].pageX;
+        pointers[i].y = touches[i].pageY;
+        pointers[i].color = [Math.random() + 0.2, Math.random() + 0.2, Math.random() + 0.2];
+    }
+});
+
+window.addEventListener('mouseup', function () {
+    pointers[0].down = false;
+});
+
+window.addEventListener('touchend', function (e) {
+    var touches = e.changedTouches;
+    for (var i = 0; i < touches.length; i++) {
+        for (var j = 0; j < pointers.length; j++) {
+            if (touches[i].identifier == pointers[j].id)
+            pointers[j].down = false;}}
+});
+</script>
+
+
+<div id="logo">
+<a href="https://mi.aliyun.com/detail/online.html?domainName=NvMu.com" target="_blank">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="500px" height="500px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 224613 224609"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#DCB86C}
+   ]]>
+  </style>
+ </defs>
+ <g id="CodeDogs.org">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <path class="fil0" d="M9870 186124l-79 32 -5846 0 0 459 5655 0c-475,1695 -1251,3185 -2186,4452 -951,-904 -1996,-1822 -2978,-2583l-333 270c998,792 2044,1727 3026,2677 -1267,1584 -2804,2772 -4293,3422 111,95 237,285 301,396 1489,-713 3026,-1901 4324,-3501 1030,1046 1965,2059 2536,2868l379 -317c-601,-824 -1568,-1870 -2645,-2931 1062,-1410 1917,-3121 2424,-5102l-285 -142zm-7953 -2931l0 3374c0,2773 -191,6638 -1917,9522 127,47 317,190 396,301 1743,-2963 1980,-7003 1980,-9807l0 -2931 9394 0c111,7082 111,12611 1695,12611 634,-16 761,-713 824,-2883 -110,-32 -285,-127 -380,-206 -32,1489 -127,2645 -396,2645 -1172,0 -1267,-7033 -1315,-12626l-10281 0zm26852 4721l1901 0 0 -459 -1901 0 0 -2440 -459 0 0 2440 -4483 0 0 459 4483 0 0 5878c0,221 -63,269 -285,285 -206,15 -903,15 -1790,0 79,142 142,317 174,444 1046,15 1631,0 1949,-80 300,-95 411,-253 411,-649l0 -5878zm-4134 1442c665,903 1298,2154 1536,2978l444 -206c-254,-824 -887,-2044 -1585,-2931l-395 159zm-7035 -5926l12151 0 0 1886 460 0 0 -2345 -13070 0 0 2345 459 0 0 -1886zm5624 2979l0 -459 -5449 0 0 459 5449 0zm381 9347c-1331,0 -1600,-190 -1600,-792l0 -5450 1837 0 0 -459 -7129 0 0 459 2108 0 0 1505c0,1569 -381,3565 -2298,5054 111,79 238,254 301,365 2028,-1569 2456,-3739 2456,-5419l0 -1505 2265 0 0 5434c0,1061 491,1268 2155,1268l5164 0c1569,0 1806,-523 1933,-2535 -158,-32 -332,-95 -475,-190 -111,1901 -285,2265 -1426,2265l-5291 0zm16318 -7715l459 0 0 -3137 5735 0 0 2012 460 0 0 -2472 -6195 0 0 -1140 5529 0 0 -459 -11391 0 0 459 5403 0 0 1140 -6147 0 0 2472 459 0 0 -2012 5688 0 0 3137zm792 2614l0 459 5338 0 0 -2423 -5291 0 0 459 4848 0 0 1505 -4895 0zm871 -2978l3580 0 0 -460 -3580 0 0 460zm0 -1870l0 459 3438 0 0 -459 -3438 0zm-2852 0l-3374 0 0 459 3374 0 0 -459zm-3548 1870l3517 0 0 -460 -3517 0 0 460zm3976 1488l0 1506 -4372 0 0 -1506 4372 0zm333 5656l0 -459 -4705 0 0 -1363 4610 0 0 -459 -4610 0 0 -1410 4832 0 0 -2424 -5292 0 0 7684 460 0 0 -1569 4705 0zm6622 -2550l-95 31 -5545 0 0 460 5212 0c-507,745 -1267,1346 -2170,1838 -887,-523 -1648,-1125 -2123,-1838l-412 174c475,729 1204,1363 2075,1885 -1140,539 -2439,888 -3675,1093 111,111 206,317 269,428 1347,-237 2709,-633 3898,-1251 1045,538 2249,950 3469,1188 63,-143 206,-317 333,-428 -1189,-190 -2345,-523 -3327,-1014 1029,-602 1885,-1378 2408,-2376l-317 -190zm8761 -7050l-2202 0 0 -3073 -459 0 0 3073 -2092 0 0 7937 460 0 0 -7478 1632 0 0 10726 459 0 0 -10726 1742 0 0 6733c0,143 -31,175 -158,191 -142,0 -507,0 -1014,-16 95,142 190,332 222,459 555,0 919,0 1140,-95 207,-95 270,-238 270,-539l0 -7192zm7652 3580c-555,1759 -1474,3279 -2598,4484 -1125,-1220 -1996,-2757 -2599,-4484l5197 0zm-3042 -3628l0 3169 -2947 0 0 -3169 2947 0zm3327 3137l-111 32 -2756 0 0 -3169 3342 0c-253,824 -586,1743 -855,2345l412 159c348,-713 729,-1886 1061,-2852l-332 -143 -96 32 -3532 0 0 -2598 -460 0 0 2598 -3406 0 0 3866c0,2249 -174,5291 -1632,7525 111,47 301,174 380,253 1458,-2186 1695,-5276 1711,-7557l317 0c618,1870 1553,3486 2773,4801 -1125,1109 -2408,1932 -3644,2407 111,111 253,286 317,429 1251,-540 2535,-1379 3644,-2488 1077,1061 2312,1885 3723,2440 79,-143 221,-317 348,-412 -1426,-491 -2693,-1315 -3739,-2360 1236,-1347 2282,-3074 2836,-5165l-301 -143zm9410 2028c333,0 650,-269 650,-681 0,-476 -317,-729 -650,-729 -317,0 -634,253 -634,729 0,412 317,681 634,681zm13117 -4404c-206,2503 -697,4515 -1362,6099 -665,-491 -1378,-966 -2076,-1394 349,-1204 793,-2931 1157,-4705l2281 0zm222 -492l-95 32 -2297 0c238,-1172 428,-2360 570,-3358l-475 -32c-127,1014 -333,2186 -570,3390l-1632 0 0 460 1537 0c-397,1838 -856,3644 -1284,4895 824,459 1679,1062 2440,1664 -777,1647 -1806,2772 -3026,3469 127,95 285,254 364,380 1220,-760 2266,-1901 3074,-3533 713,587 1331,1173 1711,1664l364 -349c-412,-538 -1077,-1156 -1853,-1790 744,-1727 1251,-3961 1457,-6812l-285 -80zm7810 5308l0 1980 -5687 0 0 -1980 5687 0zm-5687 4467l0 -2028 5687 0 0 2028 -5687 0zm-459 1157l459 0 0 -697 5687 0 0 697 460 0 0 -6084 -6606 0 0 6084zm237 -10916l0 -2154c982,-63 2044,-158 3058,-253 95,823 237,1647 412,2407l-3470 0zm7430 460l0 -460 -3501 0c-174,-760 -332,-1599 -412,-2471 1204,-142 2345,-333 3184,-523l-396 -396c-1505,396 -4420,697 -6764,856l0 5354c0,555 -396,682 -618,745 95,142 190,364 222,507 221,-143 618,-254 3770,-966 0,-111 -16,-317 0,-460l-2915 618 0 -2804 3597 0c601,2218 1631,3818 3168,3850 491,16 745,-539 903,-1917 -127,-32 -269,-111 -396,-206 -95,1156 -286,1663 -555,1647 -1140,-32 -2075,-1378 -2661,-3374l3374 0zm12484 -3818l-459 0 0 9791 459 0 0 -9791zm-2851 2772c-301,1822 -745,3676 -1411,4959 127,48 318,174 413,238 649,-1283 1140,-3216 1457,-5117l-459 -80zm-6179 6527c1442,-1520 2883,-3501 4198,-5592l-459 -206c-349,602 -745,1220 -1141,1806l-2836 301c1141,-1458 2250,-3422 3201,-5339l-444 -221c-856,1996 -2249,4150 -2678,4705 -364,554 -696,982 -950,1030 79,126 143,364 174,490 206,-95 571,-158 3201,-475 -903,1252 -1759,2297 -2092,2662 -507,602 -903,1014 -1188,1061 63,143 143,396 174,507 270,-127 713,-222 5244,-903 -16,-111 -32,-317 -16,-443l-4388 617zm4594 1965c-2091,538 -4214,1077 -5608,1410l111 475c1473,-380 3548,-919 5545,-1442l-48 -443zm7098 -3564c-1173,3041 -3707,5211 -7731,6194 111,95 237,285 317,396 4039,-1062 6653,-3296 7841,-6416l-427 -174zm-1062 -4928c856,1315 1695,3106 2028,4262l428 -158c-333,-1157 -1188,-2931 -2075,-4246l-381 142zm9395 -523c-333,-601 -1046,-1504 -1727,-2170l-333 238c650,665 1363,1600 1695,2218l365 -286zm1268 539l-96 32 -5133 0 0 459 4848 0c-1141,2377 -3437,4674 -5481,5941 111,79 269,238 348,349 982,-650 2012,-1521 2978,-2519l0 7224 444 0 0 -7430c760,760 2123,2249 2566,2804l333 -412c-443,-459 -2091,-2218 -2756,-2836 919,-1061 1695,-2218 2233,-3422l-284 -190zm3975 10631c-807,0 -981,-175 -981,-935l0 -12357 -460 0 0 12325c0,1157 317,1410 1489,1410l2931 0c1220,0 1362,-760 1457,-3168 -142,-16 -316,-111 -443,-222 -95,2360 -206,2947 -998,2947l-2995 0zm8381 -5054c32,-745 47,-1458 47,-2123l0 -1331 3296 0 0 3454 -3343 0zm3343 -7272l0 3359 -3296 0 0 -3359 3296 0zm459 -459l-4214 0 0 5608c0,2361 -95,5513 -1251,7810 111,32 301,159 396,254 792,-1569 1108,-3597 1235,-5482l3375 0 0 4690c0,253 -95,316 -333,332 -206,16 -950,16 -1853,0 79,143 142,333 174,444 1125,16 1711,0 2028,-79 300,-95 443,-270 443,-697l0 -12880zm7937 5798c-443,1806 -1236,3374 -2202,4610 -951,-1315 -1695,-2899 -2202,-4610l4404 0zm270 -491l-95 31 -5751 0 0 -4800 5227 0 0 2599c0,190 -47,253 -300,269 -238,16 -982,16 -2107,0 79,142 174,285 206,443 1188,0 1885,0 2249,-95 333,-95 412,-253 412,-617l0 -3058 -6147 0 0 13577 460 0 0 -7858 713 0c554,1853 1362,3564 2376,4975 -871,1045 -1822,1853 -2804,2360 111,95 237,253 301,349 966,-555 1917,-1331 2772,-2345 840,1077 1822,1964 2883,2551 96,-127 238,-270 365,-365 -1109,-554 -2091,-1441 -2947,-2534 1094,-1395 1981,-3201 2456,-5356l-269 -126zm9030 2297c333,0 649,-269 649,-681 0,-476 -316,-729 -649,-729 -317,0 -634,253 -634,729 0,412 317,681 634,681zm8570 -6527l2075 0 0 4151 -1837 0 0 459 1837 0 0 4832c-791,317 -1520,602 -2091,808l159 460c1188,-460 2756,-1078 4262,-1680l-95 -475 -1775 712 0 -4657 1553 0 0 -459 -1553 0 0 -4151 1870 0 0 -460 -4405 0 0 460zm9949 3248c1284,1298 2757,3120 3454,4214l364 -301c-696,-1078 -2186,-2852 -3469,-4167l-349 254zm-4514 -3755l0 459 4467 0c-1030,3011 -2757,5608 -4943,7272 127,95 317,238 396,333 1426,-1157 2662,-2677 3660,-4483l0 9426 459 0 0 -10330c349,-697 650,-1442 919,-2218l3581 0 0 -459 -8539 0zm24206 824c-380,-523 -1204,-1252 -1917,-1743l-317 269c729,507 1521,1252 1901,1790l333 -316zm-8080 8349l-2312 728 0 -4784 1822 0 0 -459 -1822 0 0 -4151 2075 0 0 -460 -4673 0 0 460 2138 0 0 4151 -1979 0 0 459 1979 0 0 4943c-871,285 -1663,523 -2297,713l159 491c1347,-444 3184,-1045 4974,-1616l-64 -475zm8444 -5767c-649,1078 -1758,2598 -2645,3628 -475,-1204 -792,-2614 -1014,-4325l0 -475 4436 0 0 -460 -4436 0 0 -2946 -459 0 0 2946 -4104 0 0 460 4104 0 0 4467c-1680,1696 -3486,3438 -4642,4516l348 348c1188,-1141 2788,-2709 4294,-4262l0 4959c0,285 -111,364 -365,380 -253,16 -1125,32 -2202,0 79,143 158,333 206,460 1299,0 1964,0 2313,-95 317,-95 507,-254 507,-761l0 -7113c697,3137 1948,5149 4357,6907 79,-142 221,-285 348,-364 -1679,-1188 -2773,-2503 -3533,-4230 935,-998 2107,-2567 2915,-3802l-428 -238zm-7857 317c792,966 1616,2265 1917,3121l427 -238c-332,-840 -1156,-2122 -1948,-3089l-396 206zm14828 -2741c-174,-570 -601,-1473 -982,-2170l-428 174c365,697 777,1616 983,2202l427 -206zm-1331 3676l0 -2583 3692 0 0 -459 -6084 0 0 459 1933 0 0 2693c0,2456 -222,5498 -2186,7922 127,79 285,206 364,301 1933,-2472 2250,-5292 2281,-7874l2472 0c-111,5006 -269,6749 -555,7113 -110,175 -221,190 -443,190 -222,0 -808,0 -1458,-63 95,142 143,333 143,475 523,32 1077,48 1394,32 364,0 586,-95 776,-333 381,-507 492,-2122 618,-7541 16,-111 16,-332 16,-332l-2963 0zm11518 -3074l0 -460 -6004 0c301,-712 586,-1457 808,-2233l-476 -95c-506,1885 -1378,3675 -2455,4880 111,79 317,221 396,300 554,-665 1061,-1489 1505,-2392l6226 0zm-475 3454c-650,634 -1759,1537 -2646,2139 -317,-1046 -555,-2187 -745,-3375 1299,-348 2567,-745 3486,-1172l-492 -349c-1235,634 -3643,1284 -5687,1743l0 7541c0,618 -253,871 -396,982 95,95 238,317 285,444 238,-254 587,-428 3502,-1917 -48,-95 -111,-301 -127,-428l-2804 1394 0 -7699c586,-143 1204,-270 1822,-428 633,3992 1901,7399 4150,8967 79,-127 238,-270 364,-349 -1441,-950 -2502,-2725 -3231,-4927 919,-602 2075,-1473 2899,-2281l-380 -285zm8000 871l-2154 681 0 -3928 2091 0 0 -460 -2091 0 0 -3390 -460 0 0 3390 -2360 0 0 460 2360 0 0 4071c-982,301 -1885,586 -2598,792l206 475c713,-237 1521,-491 2392,-776l0 5086c0,253 -95,316 -332,332 -206,16 -951,16 -1870,0 95,143 174,333 206,444 1109,16 1679,16 1996,-79 301,-95 460,-254 460,-697l0 -5244 2218 -745 -64 -412zm1474 5782l0 -4578 6384 0 0 4578 -6384 0zm6384 -9521l0 4484 -6384 0 0 -4484 6384 0zm-3707 -459c301,-792 618,-1885 887,-2757l-507 -126c-174,824 -523,2075 -839,2883l-2678 0 0 11375 460 0 0 -935 6384 0 0 824 460 0 0 -11264 -4167 0zm-149424 -19176c-488,2052 -1211,3634 -2288,4828 -1143,-505 -2321,-1026 -3499,-1497 454,-976 976,-2120 1447,-3331l4340 0zm4812 0l0 -1683 -8496 0c471,-1261 875,-2557 1194,-3751l-1682 -252c-337,1244 -791,2641 -1329,4003l-4475 0 0 1683 3786 0c-640,1530 -1330,2961 -1969,4071 1531,589 3062,1279 4525,1968 -1581,1111 -3717,1784 -6594,2170 336,421 690,1077 841,1565 3297,-539 5703,-1430 7469,-2894 2069,1043 3887,2103 5232,3029l1245 -1464c-1346,-858 -3179,-1851 -5215,-2843 1144,-1430 1901,-3247 2440,-5602l3028 0zm6645 -2557l1531 0 0 -774 3853 0 0 774 1530 0 0 -774 3920 0 0 -1245 -3920 0 0 -976 -1530 0 0 976 -3853 0 0 -976 -1531 0 0 976 -3852 0 0 1245 3852 0 0 774zm-118 8293c-487,960 -1295,2104 -2271,2759l1144 825c993,-791 1750,-2002 2305,-3012l-1178 -572zm1969 2675c0,169 -68,219 -252,236 -169,0 -825,0 -1464,-17 185,370 387,875 454,1245 942,17 1615,0 2069,-202 471,-219 589,-538 589,-1211l0 -3769 -1396 0 0 3718zm1615 -1968c488,858 992,2019 1127,2759l1211 -438c-185,-723 -690,-1867 -1228,-2708l-1110 387zm1884 -437c925,1026 1985,2405 2405,3314l1246 -623c-471,-925 -1548,-2271 -2490,-3230l-1161 539zm-5821 -5569l7924 0 0 858 -7924 0 0 -858zm0 -1783l7924 0 0 841 -7924 0 0 -841zm11440 5669l0 -1228 -8798 0c151,-269 302,-521 437,-807l6342 0 0 -4627 -10851 0 0 4627 2843 0c-151,269 -303,538 -504,807l-4391 0 0 1228 3247 0c-875,758 -2053,1447 -3533,1969 303,218 774,723 975,1076 1986,-790 3449,-1833 4526,-3045l4273 0c1178,1346 3011,2524 4727,3113 219,-354 640,-892 942,-1144 -1379,-387 -2843,-1111 -3919,-1969l3684 0zm6409 -5232l1599 0 0 -1430 4171 0 0 1430 1616 0 0 -1430 3600 0 0 -1497 -3600 0 0 -1716 -1616 0 0 1716 -4171 0 0 -1716 -1599 0 0 1716 -3701 0 0 1497 3701 0 0 1430zm1347 8832c-960,0 -1582,-218 -1582,-723 0,-589 589,-1464 8882,-6006 152,-50 286,-151 354,-219l-1110 -824 -337 51 -9656 0 0 1446 6846 0c-6274,3668 -6577,4677 -6577,5703 0,1279 1059,2087 3331,2087l6611 0c1985,0 2692,-556 2910,-3449 -471,-84 -1043,-269 -1463,-522 -84,2120 -404,2456 -1296,2456l-6913 0zm25789 -10867c-639,-673 -1968,-1682 -2927,-2372l-1161 959c992,740 2271,1800 2877,2506l1211 -1093zm1312 3095l0 -1531 -6275 0 0 -4155 -1716 0 0 4155 -6426 0 0 1531 6006 0c-1447,2675 -4004,5249 -6578,6561 387,336 908,959 1194,1346 2170,-1245 4240,-3331 5804,-5720l0 7554 1716 0 0 -8176c1598,2422 3718,4794 5653,6224 302,-437 858,-1060 1262,-1396 -2221,-1380 -4762,-3970 -6258,-6393l5618 0zm10969 -3550l4811 0 0 7487 1565 0 0 -8849 -7890 0 0 8849 1514 0 0 -7487zm-2019 7184c-303,-354 -1396,-1632 -2036,-2321 757,-1144 1414,-2390 1851,-3685l-824 -555 -303 67 -1514 0 1144 -706c-303,-606 -942,-1464 -1565,-2086l-1194 689c538,606 1144,1498 1446,2103l-2876 0 0 1414 3819 0c-959,2035 -2591,3970 -4223,5063 219,320 538,1144 656,1582 572,-421 1178,-943 1733,-1548l0 6090 1497 0 0 -6898c522,707 1094,1515 1396,2036l993 -1245zm6241 4710c-404,0 -538,-134 -538,-589l0 -3986 -959 0c286,-1094 370,-2187 370,-3146l0 -3045 -1497 0 0 3011c0,2591 -471,5821 -4693,8008 302,235 823,841 1009,1161 2271,-1212 3583,-2810 4323,-4492l0 2658c0,1228 488,1581 1716,1581l1363 0c1547,0 1750,-723 1918,-3331 -371,-101 -875,-303 -1245,-589 -51,2288 -152,2759 -656,2759l-1111 0zm7352 -9740l10902 0 0 2103 1632 0 0 -3482 -2776 0c538,-673 1127,-1481 1632,-2238l-1632 -555c-404,858 -1093,1968 -1699,2793l-2675 0 1211 -455c-236,-689 -858,-1699 -1397,-2439l-1346 488c505,740 1043,1733 1279,2406l-3297 0 791 -387c-320,-623 -1044,-1548 -1700,-2204l-1312 605c539,606 1128,1380 1447,1986l-2624 0 0 3482 1564 0 0 -2103zm10447 7435l0 -6089 -10009 0 0 6022 1581 0 0 -4626 6780 0 0 4693 1648 0zm-4256 -3986l-1632 0 0 1699c0,1447 -437,3448 -6325,4828 370,303 841,875 1026,1228 6124,-1632 6931,-4105 6931,-6022l0 -1733zm2339 6056c-707,0 -841,-68 -841,-505l0 -2439 -1565 0 0 2439c0,1430 420,1834 2221,1834l2641 0c1396,0 1817,-454 1985,-2406 -420,-84 -1043,-319 -1379,-538 -68,1413 -169,1615 -757,1615l-2305 0zm52761 -30869l0 -35652 12473 0 0 45333 -24573 0c-3538,0 -6269,-264 -8193,-791 -1923,-527 -3630,-1474 -5119,-2839 -3165,-2854 -4747,-7478 -4747,-13870l0 -27833 12380 0 0 29136c0,2048 543,3647 1629,4795 1086,1147 2560,1721 4421,1721l11729 0zm-212137 -35652l24014 0c3600,0 6346,265 8238,792 1893,528 3615,1474 5166,2839 3166,2916 4747,7509 4747,13776l0 27926 -12472 0 0 -29321c0,-2235 -497,-3848 -1490,-4841 -993,-993 -2637,-1489 -4933,-1489l-10798 0 0 35651 -12472 0 0 -45333zm73442 31184l12660 -31184 13218 0 -19548 45333 -13404 0 -18058 -45333 13590 0 11542 31184zm38864 -37924l5293 -12791 3126 0 5293 12791 -3184 0 -1246 -2954 -4852 0 -1247 2954 -3183 0zm6866 -9704l-1822 4469 3643 0 -1821 -4469zm10950 4852l0 4852 -2723 0 0 -12791 6251 0c1790,0 3037,230 3740,690 486,307 860,713 1122,1218 262,505 393,1058 393,1659 0,1214 -307,2154 -920,2819 -384,396 -889,696 -1516,901 499,179 876,368 1132,566 256,198 486,489 690,873 154,306 266,600 336,882 71,281 124,697 163,1246 77,921 179,1566 307,1937l-3049 0c-90,-294 -186,-901 -288,-1822 -64,-741 -195,-1310 -393,-1706 -198,-397 -496,-710 -892,-940 -498,-268 -1221,-396 -2167,-384l-2186 0zm0 -2282l3816 0c639,0 1093,-96 1361,-288 410,-280 614,-773 614,-1476 0,-780 -306,-1279 -920,-1496 -218,-76 -569,-116 -1055,-116l-3816 0 0 3376zm13808 -3376l-4066 0 0 -2281 11027 0 0 2281 -4238 0 0 10510 -2723 0 0 -10510zm30377 -2281l-5600 12791 -2723 0 -5389 -12791 3068 0 3760 9627 3816 -9627 3068 0zm1342 12791l0 -12791 2724 0 0 12791 -2724 0zm5254 0l0 -2282 5850 0c933,0 1553,-90 1860,-269 448,-268 671,-671 671,-1208 0,-626 -262,-1080 -786,-1361 -294,-167 -767,-249 -1419,-249l-2378 0c-1445,0 -2486,-263 -3126,-787 -397,-332 -707,-748 -930,-1246 -224,-499 -336,-1036 -336,-1611 0,-896 262,-1713 787,-2455 510,-716 1329,-1138 2454,-1266 384,-38 952,-57 1707,-57l6348 0 0 2281 -5734 0c-857,14 -1426,52 -1707,116 -575,141 -863,575 -863,1304 0,614 243,1023 729,1227 320,154 856,231 1610,231l2053 0c1048,0 1828,89 2339,268 908,307 1534,844 1880,1611 268,613 402,1272 402,1975 0,780 -179,1477 -537,2090 -498,870 -1246,1394 -2243,1573 -486,76 -1221,115 -2206,115l-6425 0zm13387 0l0 -12791 2723 0 0 12791 -2723 0zm10931 -12868c1278,0 2404,217 3375,652 1138,524 1937,1400 2397,2627 358,959 537,2084 537,3376 0,1304 -217,2435 -652,3394 -549,1138 -1393,1937 -2531,2397 -844,333 -1815,499 -2915,499 -1445,0 -2698,-269 -3759,-806 -895,-447 -1579,-1150 -2052,-2109 -473,-959 -709,-2122 -709,-3491 0,-2441 607,-4181 1822,-5216 1022,-869 2518,-1310 4487,-1323zm19 2148c-1253,0 -2147,409 -2685,1227 -434,639 -651,1669 -651,3088 0,1496 268,2595 805,3298 536,691 1387,1036 2550,1036 1125,0 1954,-352 2484,-1055 531,-703 795,-1790 795,-3260 0,-1342 -217,-2365 -652,-3068 -498,-831 -1380,-1254 -2646,-1266zm10816 1343l0 9377 -2608 0 0 -12791 3491 0 5081 9531 0 -9531 2590 0 0 12791 -3338 0 -5216 -9377zm-94856 16117l30619 0c4157,0 7322,312 9494,932 2172,620 4002,1706 5492,3258 2730,2978 4096,7074 4096,12287l0 28856 -12474 0 0 -26901c0,-2172 -93,-3693 -279,-4561 -186,-869 -621,-1645 -1303,-2327 -1303,-1242 -3258,-1862 -5864,-1862l-6609 0 0 35651 -12473 0 0 -35651 -13405 0 0 35651 -12472 0 0 -35352c0,-18314 -23648,-21673 -46009,-43275 -12206,-12020 -18139,-24081 -18139,-36876 0,-20627 16781,-37408 37408,-37408 13678,0 26258,7459 32833,19471l189 344 192 -344c6574,-12012 19155,-19471 32834,-19471 20624,0 37406,16781 37406,37408 0,12795 -5933,24856 -18136,36876 -1458,1435 -4539,3864 -8563,7083 1790,-2097 3248,-3700 4260,-4695 11198,-11030 16643,-22099 16643,-33841 0,-18931 -15401,-34330 -34328,-34330 -12554,0 -24099,6845 -30132,17869l-176 316 -174 -316c-6034,-11024 -17578,-17869 -30131,-17869 -18929,0 -34330,15399 -34330,34330 0,11742 5158,23111 16647,33841 10226,9550 42566,30895 56884,30906zm23500 114094l0 -3946 2920 0 0 667 -2122 0 0 877 1973 0 0 666 -1973 0 0 1069 2199 0 0 667 -2997 0zm-4908 0l0 -3946 1196 0 708 2692 698 -2692 1200 0 0 3946 -738 0 -3 -3106 -778 3106 -768 0 -774 -3106 -3 3106 -738 0zm-2181 -1564l-549 -1462 -532 1462 1081 0zm1460 1564l-860 0 -341 -898 -1583 0 -327 898 -845 0 1532 -3946 843 0 1581 3946zm-7840 0l0 -3946 773 0 1624 2645 0 -2645 739 0 0 3946 -799 0 -1599 -2593 0 2593 -738 0zm-5511 0l0 -3946 773 0 1624 2645 0 -2645 739 0 0 3946 -798 0 -1600 -2593 0 2593 -738 0zm-1865 0l0 -3946 799 0 0 3946 -799 0zm-2164 -1564l-549 -1462 -533 1462 1082 0zm1460 1564l-860 0 -341 -898 -1583 0 -328 898 -845 0 1532 -3946 844 0 1581 3946zm-8462 0l0 -3946 1197 0 707 2692 699 -2692 1199 0 0 3946 -738 0 -3 -3106 -778 3106 -767 0 -775 -3106 -3 3106 -738 0zm-3926 -1975c0,447 104,786 310,1018 207,230 470,345 788,345 318,0 579,-114 784,-343 204,-230 306,-573 306,-1031 0,-453 -99,-791 -299,-1013 -198,-223 -462,-335 -791,-335 -329,0 -594,113 -796,338 -201,226 -302,566 -302,1021zm-821 26c0,-402 61,-740 181,-1014 89,-201 212,-382 367,-542 155,-159 325,-278 510,-356 246,-104 530,-156 851,-156 583,0 1048,181 1397,542 349,362 524,864 524,1508 0,638 -174,1138 -520,1498 -347,361 -810,541 -1389,541 -587,0 -1055,-179 -1401,-538 -347,-358 -520,-853 -520,-1483zm-3322 -1330l0 2612 592 0c222,0 382,-12 481,-37 129,-32 236,-87 320,-165 85,-77 154,-204 207,-380 55,-176 81,-418 81,-723 0,-304 -26,-538 -81,-701 -53,-164 -128,-291 -225,-382 -95,-92 -218,-154 -367,-186 -110,-25 -328,-38 -651,-38l-357 0zm-798 -667l1452 0c328,0 578,25 750,76 230,68 429,189 593,364 166,173 291,386 377,639 86,251 128,563 128,932 0,325 -40,605 -121,840 -98,287 -239,520 -421,697 -138,135 -325,240 -558,314 -176,57 -411,84 -704,84l-1496 0 0 -3946zm-5417 2668l777 -77c47,260 140,450 283,572 142,122 334,183 576,183 255,0 448,-55 577,-163 130,-109 195,-235 195,-380 0,-94 -28,-173 -81,-239 -54,-65 -150,-122 -286,-170 -93,-33 -304,-90 -635,-173 -425,-106 -724,-237 -895,-392 -242,-217 -362,-483 -362,-796 0,-201 57,-391 169,-566 115,-175 278,-309 492,-400 214,-92 471,-138 774,-138 493,0 866,109 1115,329 249,219 380,511 393,878l-800 27c-34,-203 -106,-350 -217,-439 -111,-89 -278,-134 -501,-134 -229,0 -409,48 -539,143 -84,62 -125,144 -125,246 0,94 39,174 118,241 100,85 344,173 730,265 387,91 672,186 857,284 186,98 330,231 435,401 105,170 157,379 157,629 0,225 -62,437 -188,635 -126,198 -303,344 -533,440 -229,96 -516,144 -859,144 -498,0 -881,-115 -1148,-346 -268,-229 -426,-564 -479,-1004zm-1655 1278l0 -3946 798 0 0 3946 -798 0zm-4259 0l0 -3946 799 0 0 1554 1554 0 0 -1554 799 0 0 3946 -799 0 0 -1725 -1554 0 0 1725 -799 0zm-2785 0l0 -3279 -1169 0 0 -667 3131 0 0 667 -1163 0 0 3279 -799 0zm47752 -7323l-1855 -7892 1642 0 1174 5421 1441 -5421 1898 0 1379 5513 1201 -5513 1603 0 -1901 7892 -1706 0 -1556 -5901 -1567 5901 -1753 0zm-8957 -3952c0,895 207,1573 621,2036 413,460 938,692 1574,692 637,0 1159,-230 1569,-687 407,-459 611,-1146 611,-2063 0,-905 -198,-1581 -597,-2026 -397,-446 -924,-669 -1583,-669 -658,0 -1189,226 -1591,676 -402,452 -604,1132 -604,2041zm-1642 54c0,-805 121,-1481 361,-2029 178,-402 425,-764 735,-1083 311,-320 650,-557 1020,-713 492,-208 1060,-312 1702,-312 1165,0 2095,362 2794,1084 699,723 1047,1728 1047,3016 0,1277 -347,2276 -1039,2996 -693,721 -1620,1082 -2779,1082 -1175,0 -2109,-358 -2801,-1077 -693,-716 -1040,-1704 -1040,-2964zm-8242 3898l0 -7892 1547 0 3248 5289 0 -5289 1477 0 0 7892 -1596 0 -3198 -5188 0 5188 -1478 0zm-10180 0l0 -3322 -2893 -4570 1868 0 1866 3124 1817 -3124 1833 0 -2893 4581 0 3311 -1598 0zm-10644 -7892l1598 0 0 4276c0,680 20,1119 59,1319 68,323 228,585 481,779 255,197 602,294 1044,294 446,0 784,-92 1012,-278 228,-185 363,-411 409,-681 46,-270 70,-716 70,-1341l0 -4368 1598 0 0 4150c0,947 -42,1618 -128,2009 -87,391 -245,722 -477,993 -228,269 -537,482 -923,642 -388,160 -891,241 -1514,241 -751,0 -1321,-87 -1708,-261 -388,-175 -695,-401 -920,-680 -226,-279 -374,-569 -445,-876 -105,-452 -156,-1121 -156,-2004l0 -4214zm-6974 4441l0 2116 1477 0c573,0 939,-16 1093,-47 237,-44 430,-149 579,-316 148,-169 224,-391 224,-672 0,-239 -57,-440 -173,-605 -114,-165 -281,-286 -498,-362 -217,-75 -689,-114 -1414,-114l-1288 0zm0 -3129l0 1818 1044 0c618,0 1005,-9 1155,-27 272,-32 487,-125 643,-281 156,-156 233,-361 233,-614 0,-244 -68,-441 -202,-593 -134,-153 -334,-245 -598,-276 -159,-18 -613,-27 -1360,-27l-915 0zm-1598 -1312l3156 0c626,0 1091,26 1398,77 309,53 582,162 824,325 243,165 445,384 607,658 162,274 242,582 242,922 0,368 -99,707 -297,1014 -199,309 -468,538 -808,692 479,142 846,381 1105,719 258,338 386,734 386,1192 0,360 -82,709 -249,1048 -168,341 -396,612 -686,817 -288,202 -645,327 -1069,374 -265,28 -906,46 -1922,54l-2687 0 0 -7892zm-11701 -1025c-4747,0 -8597,3849 -8597,8597 0,4747 3850,8597 8597,8597 4748,0 8597,-3850 8597,-8597 0,-4748 -3849,-8597 -8597,-8597zm921 13480c0,-510 412,-921 921,-921 509,0 921,411 921,921 0,508 -412,920 -921,920 -509,0 -921,-412 -921,-920zm-5065 0c0,-510 412,-921 920,-921 509,0 921,411 921,921 0,508 -412,920 -921,920 -508,0 -920,-412 -920,-920zm8051 -6448l928 -1381 921 0c381,0 691,309 691,691 0,381 -310,690 -691,690l-407 0 -2355 4605 -7891 0 -1550 -4605 10354 0zm-683 1151l0 0c126,0 230,-103 230,-230 0,-127 -104,-230 -230,-230 -128,0 -230,103 -230,230 0,127 102,230 230,230zm-5066 461l0 0c-127,0 -230,103 -230,230 0,127 103,231 230,231 127,0 230,-104 230,-231 0,-127 -103,-230 -230,-230zm461 -921l0 0c-128,0 -231,103 -231,230 0,127 103,230 231,230 126,0 229,-103 229,-230 0,-127 -103,-230 -229,-230zm459 921l0 0c-127,0 -230,103 -230,230 0,127 103,231 230,231 126,0 230,-104 230,-231 0,-127 -104,-230 -230,-230zm1383 -921l0 0c-128,0 -231,103 -231,230 0,127 103,230 231,230 126,0 230,-103 230,-230 0,-127 -104,-230 -230,-230zm921 0l0 0c-128,0 -231,103 -231,230 0,127 103,230 231,230 126,0 230,-103 230,-230 0,-127 -104,-230 -230,-230zm921 0l0 0c-128,0 -230,103 -230,230 0,127 102,230 230,230 126,0 230,-103 230,-230 0,-127 -104,-230 -230,-230zm460 1382l0 0c127,0 231,-104 231,-231 0,-127 -104,-230 -231,-230 -127,0 -230,103 -230,230 0,127 103,231 230,231zm-460 921l0 0c126,0 230,-104 230,-231 0,-127 -104,-230 -230,-230 -128,0 -230,103 -230,230 0,127 102,231 230,231zm-461 -1382l0 0c-128,0 -230,103 -230,230 0,127 102,231 230,231 127,0 231,-104 231,-231 0,-127 -104,-230 -231,-230zm0 2302l0 0c127,0 229,-103 229,-230 0,-127 -102,-229 -229,-229 -128,0 -230,102 -230,229 0,127 102,230 230,230zm-460 -920l0 0c126,0 230,-104 230,-231 0,-127 -104,-230 -230,-230 -128,0 -231,103 -231,230 0,127 103,231 231,231zm-461 -1382l0 0c-128,0 -230,103 -230,230 0,127 102,231 230,231 127,0 230,-104 230,-231 0,-127 -103,-230 -230,-230zm0 2302l0 0c127,0 229,-103 229,-230 0,-127 -102,-229 -229,-229 -128,0 -230,102 -230,229 0,127 102,230 230,230zm-460 -920l0 0c126,0 230,-104 230,-231 0,-127 -104,-230 -230,-230 -128,0 -231,103 -231,230 0,127 103,231 231,231zm-461 -1382l0 0c-128,0 -230,103 -230,230 0,127 102,231 230,231 126,0 230,-104 230,-231 0,-127 -104,-230 -230,-230zm0 2302l0 0c126,0 229,-103 229,-230 0,-127 -103,-229 -229,-229 -128,0 -230,102 -230,229 0,127 102,230 230,230zm-460 -920l0 0c126,0 229,-104 229,-231 0,-127 -103,-230 -229,-230 -128,0 -231,103 -231,230 0,127 103,231 231,231zm0 -1843l0 0c126,0 230,-103 230,-230 0,-127 -104,-230 -230,-230 -128,0 -231,103 -231,230 0,127 103,230 231,230zm-460 2763l0 0c126,0 229,-103 229,-230 0,-127 -103,-229 -229,-229 -128,0 -230,102 -230,229 0,127 102,230 230,230zm-461 -920l0 0c126,0 229,-104 229,-231 0,-127 -103,-230 -229,-230 -128,0 -231,103 -231,230 0,127 103,231 231,231zm-460 920l0 0c126,0 229,-103 229,-230 0,-127 -103,-229 -229,-229 -128,0 -230,102 -230,229 0,127 102,230 230,230zm-460 -920l0 0c126,0 229,-104 229,-231 0,-127 -103,-230 -229,-230 -128,0 -231,103 -231,230 0,127 103,231 231,231zm-2 -1843l0 0c127,0 231,-103 231,-230 0,-127 -104,-230 -231,-230 -127,0 -229,103 -229,230 0,127 102,230 229,230zm-460 461l0 0c-127,0 -230,103 -230,230 0,127 103,231 230,231 126,0 231,-104 231,-231 0,-127 -105,-230 -231,-230zm0 2302l0 0c126,0 229,-103 229,-230 0,-127 -103,-229 -229,-229 -127,0 -230,102 -230,229 0,127 103,230 230,230zm-460 -920l0 0c127,0 230,-104 230,-231 0,-127 -103,-230 -230,-230 -127,0 -230,103 -230,230 0,127 103,231 230,231zm-1 -1843l0 0c127,0 231,-103 231,-230 0,-127 -104,-230 -231,-230 -128,0 -229,103 -229,230 0,127 101,230 229,230zm-460 2763l0 0c127,0 229,-103 229,-230 0,-127 -102,-229 -229,-229 -128,0 -230,102 -230,229 0,127 102,230 230,230zm0 -1841l0 0c127,0 229,-104 229,-231 0,-127 -102,-230 -229,-230 -128,0 -230,103 -230,230 0,127 102,231 230,231zm-460 921l0 0c126,0 228,-104 228,-231 0,-127 -102,-230 -228,-230 -128,0 -231,103 -231,230 0,127 103,231 231,231zm0 -1843l0 0c126,0 228,-103 228,-230 0,-127 -102,-230 -228,-230 -128,0 -231,103 -231,230 0,127 103,230 231,230zm-461 922l0 0c127,0 229,-104 229,-231 0,-127 -102,-230 -229,-230 -128,0 -230,103 -230,230 0,127 102,231 230,231zm-460 -922l0 0c126,0 230,-103 230,-230 0,-127 -104,-230 -230,-230 -128,0 -231,103 -231,230 0,127 103,230 231,230zm5065 10994c-5843,0 -10581,-4736 -10581,-10580 0,-5844 4738,-10581 10581,-10581l65569 0c5843,0 10580,4737 10580,10581 0,5844 -4737,10580 -10580,10580l-65569 0zm-6846 -3734c1752,1752 4173,2836 6846,2836l65569 0c2676,0 5097,-1083 6846,-2832 1752,-1756 2836,-4177 2836,-6850 0,-2676 -1083,-5098 -2832,-6847 -1753,-1753 -4174,-2836 -6850,-2836l-65569 0c-2673,0 -5094,1084 -6846,2836 -1752,1752 -2836,4173 -2836,6847 0,2673 1084,5094 2836,6846z"/>
+ </g>
+</svg>
+</a>
+</div>
+
+<div id="button-l"><iframe name="button-l" width=50px height=100% frameborder=0 src="son/button-l.html" ></iframe></div>
+<div id="button-r"><iframe name="button-r" width=50px height=100% frameborder=0 src="son/button-r.html" ></iframe></div>
+<div id="links"><iframe name="links" width=100% height=50px frameborder=0 src="son/links.html" ></iframe></div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?51f1a293ce9dc4f0db";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</body>
+</html>
