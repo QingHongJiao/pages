@@ -1,0 +1,57 @@
+.loginframe a, .loginframe img{border:0;}
+.loginframe {
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 133%;
+	background-color: black;
+	z-index: 1001;
+	-moz-opacity: 0.8;
+	opacity: 0.50;
+	filter: alpha(opacity=80);
+}
+.loginqrcode {
+	width: 300px;
+	height: 360px;
+	background-color: #fff;
+	padding: 10px;
+	position: absolute;
+	display: none;
+	left: 45%;
+	z-index: 1002;
+}
+.loginqrcode .close1 {
+	width: 300px;
+	height: 20px;
+}
+.loginqrcode #closebt {
+	float: right;
+}
+.loginqrcode #closebt img {
+	width: 20px;
+}
+.loginqrcode .goodtxt {
+	text-align: center;
+}
+.loginqrcode .goodtxt img{vertical-align:middle;}
+.loginqrcode .goodtxt p {
+	height: 30px;
+	line-height: 30px;
+	font-size: 16px;
+	color: #000;
+	font-weight: 600;
+}
+.loginqrcode .code-img {
+	width: 250px;
+	margin: 10px auto 0 auto;
+	padding: 10px;
+}
+.loginqrcode .code-img img {
+	width: 240px;
+}
+
+.topqr{
+	margin: 85px auto 10px auto;
+}
