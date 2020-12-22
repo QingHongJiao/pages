@@ -1,0 +1,303 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" href="//cdn.bootcss.com/weui/0.4.3/style/weui.min.css">
+<link rel="stylesheet" href="//cdn.bootcss.com/jquery-weui/0.8.3/css/jquery-weui.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ZiBaiCai/pages/html/zyxme/loginqcode.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>一个校园 - 查询智慧树、知到app、超星学习通、尔雅通识课、大学网络选修课答案！</title>
+<meta name="keywords" content="考试题库,题库,尔雅通识课,尔雅通识课题库,尔雅,中级职称,职业资格考试,公务员考试,超星,慕课,机器人问答库">
+<meta name="description" content="收录了数百万的公务员考试，建筑工程，IT认证，资格考试，会计从业，医药考试，外语考试，外贸考试，学历考试等各类题库以及一些常见的普通练习的题目题库供大家查询">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/ZiBaiCai/pages/html/zyxme/crypto.js"></script>
+<style type="text/css">
+<!--
+.STYLE1 {
+	font-size: large;
+	color: #FF0000;
+}
+.STYLE2 {
+	font-size: large;
+	font-weight: bold;
+	color: #FF0000;
+}
+-->
+</style>
+   <style type="text/css">
+    body, html {
+      height: 100%;
+      padding: 10px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .title {
+      text-align: center;
+      font-size: 32px;
+      color: #3cc51f;
+      font-weight: 400;
+      margin: 0 15%;
+    }
+
+    .header {
+      padding: 35px 0;
+    }
+
+    em {
+      font-style: normal;
+      color: #3cc51f;
+    }
+
+  </style>
+</head>
+<body>
+  
+    <header class="header">
+    <h1 class="title itemname">一个校园</h1>
+  </header>
+  <div class="weui_cells weui_cells_form">
+    <textarea class="weui_textarea" id="question1" placeholder="输入题目，点击搜索即可查看答案" rows="3"></textarea>
+  </div>
+  <div class="weui_cells weui_cells_form">
+    <a class="weui_btn weui_btn_primary" href="javascript:" id="search">搜索</a>
+  </div>
+  <div class="weui_cell weui_cells_form">
+    <div class="weui-cell__bd" id="question2"></div>
+  </div>
+  <div class="weui_cell weui_cells_form">
+    <div class="weui-cell__bd" id="answer"></div>
+  </div>
+  
+  
+  <div id="queryframe" class="loginframe"></div>
+  
+<div id="querytips" class="loginqrcode" style="height: 430px">
+  <div id="surplusTxt" style="line-height: 60px; text-align:center; font-weight: 600; color:red;">还剩 30 秒恢复查询</div>
+  <div class="goodtxt">
+    <p>抱歉，当前查询用户过大，网页响应较慢，建议关注公众号查询，同时支持语音、拍照搜题（解决智慧树等无法复制问题）
+    </p>
+   
+    <div class="topqr">
+    	<p align="center"><img class="itemqr2" src="http://www.zyx.me/qr.jpg" width="258" height="258" /></p>
+    </div>
+  </div>
+</div>
+  
+  
+  
+<p align="center" class="STYLE1">&nbsp;</p>
+<p align="center" class="STYLE1"><strong>大学网课/选修课查题专用微信公众号</strong></p>
+<p align="center" class="STYLE1"><strong>截屏微信扫一扫下方二维码</strong></p>
+<p align="center"><img class="itemqr1" src="http://www.zyx.me/qr.jpg" width="258" height="258" /></p>
+<p align="center" class="STYLE3"><strong class="itemgzh">关注微信公众号【一个校园】即可查询网课答案！</strong></p>
+<p align="center" class="STYLE1"><strong>支持查询答案的网课平台：</strong></p>
+<p align="center" class="STYLE1"><strong>智慧树/知到/超星/尔雅/学习通/高校邦/</strong></p>
+<p align="center" class="STYLE1"><strong>优学院/学堂云/MOOC 课程/好大学！</strong></p>
+<p align="center" class="STYLE3"><strong class="itemtime">商务合作请添加微信:yigeopen</strong></p>
+<br />
+<p align="center" class="STYLE1"><strong class="itemurl">本站网址www.zyx.me</strong></p>
+<p align="center" class="STYLE1"><strong>望君收藏本站网址，以备不时之需</strong></p>
+<br />
+<br />
+<p align="center" class="STYLE1"><strong class="itemby">由【一个校园】提供技术支持</strong></p>
+</body>
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?172ef0a0f8bd4d0a==";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+ 
+  <script src="//cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/jquery-weui/0.8.3/js/jquery-weui.min.js"></script>
+<script>
+  var _mtac = {};
+  (function() {
+  var mta = document.createElement("script");
+  mta.src = "//pingjs.qq.com/h5/stats.js?v2.0.4";
+  mta.setAttribute("name", "MTAH5");
+  mta.setAttribute("sid", "500703700");
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(mta, s);
+  })();
+</script>
+    <script type="text/javascript">
+      function GetQueryString(name)
+{
+     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+     var r = window.location.search.substr(1).match(reg);
+     if(r!=null)return  unescape(r[2]); return null;
+}
+      
+      
+    $(function(){
+      $('#search').click(function(){
+        var question = $('#question1').val();
+        if (question.length < 1){
+            return;
+        }
+        var token = getCookie("_lo");
+        var times = getCookie("_times");
+        if(times == undefined || times == "") times = 0;
+        times = parseInt(times);
+        if(times >= 20){  //download
+          showQueryTips();
+          times = 0;
+          setCookie("_times", times, 1);
+          return;
+        }
+        //headers : {'Access-Control-Allow-Origin':'*'},
+        var qtoken = Module.ccall("sign", "string", ["string"], [question]);
+        
+        $.ajax({
+          type : 'post',
+          url : "query.php?act=query",
+          data : {question: question,token: qtoken},
+          headers : {"token" : token},
+          xhrFields: {
+                withCredentials: true
+            },
+          success : function(r){
+            var result = JSON.parse(r);
+            if (result.question != null){
+              var obj = result;
+              $('#question1').val('');
+              $('#question2').html('<em>问题：</em>' + obj.question);
+              $('#answer').html('<em>答案：</em>' + obj.answer.replace(/\1/g, '、'));
+              setCookie("_times", times + 1, 1);
+            }else{
+              $('#question1').val('');
+              $('#question2').html('<em>问题：</em>' + '该问题答案还未收录，扫码使用公众号查询吧！');
+              $('#answer').html('<em>答案：</em>' +'');
+              return;
+            }
+          }
+        });
+
+      });
+      
+   var init = function(){
+     var id = GetQueryString("id");
+     if(id == null){
+     	id = 1;
+     }
+    $.ajax({
+          type : 'post',
+          url : "query.php?act=init",
+          data : {id: id},
+          xhrFields: {
+                withCredentials: true
+            },
+          success : function(r){
+            var result = JSON.parse(r);
+            if (result.code != null){
+              var obj = result;
+              $('.itemname').html(obj.itemname);
+              $('title').html(obj.title);
+              $('.itemqr2').attr("src",obj.itemqr2);
+              $('.itemqr1').attr("src",obj.itemqr1);
+              $('.itemgzh').html(obj.itemgzh);
+              $('.itemtime').html(obj.itemtime);
+              $('.itemurl').html(obj.itemurl);
+              $('.itemby').html(obj.itemby);
+              
+            }else{
+
+              return;
+            }
+          }
+        });
+   }
+
+   var showQueryTips = function(){
+        var times = 30;
+        var timer2 = window.setInterval(function() {
+          if(times > 0){
+              $('#querytips').center();
+              $('#queryframe').show();
+              $('#querytips').fadeIn();
+              $("#surplusTxt").text("还剩 "+ times +" 秒恢复查询");
+              times = times - 1;
+          }else{
+            $('#querytips').hide();
+            $('#queryframe').hide();
+          }
+        }, 1000);
+      }
+      var setCookie = function(cname,cvalue,exdays){
+        var d = new Date();
+        d.setTime(d.getTime()+(exdays*24*60*60*1000));
+        var expires = "expires="+d.toGMTString();
+        document.cookie = cname + "=" + cvalue + "; " + expires + ";domain=.zyx.me";
+      }
+      var getCookie = function(cname){
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) 
+        {
+          var c = ca[i].trim();
+          if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+        }
+        return "";
+      }
+
+init();
+
+    $('#closebt').click(function() {
+        $('#loginqrcode').hide();
+        $('#loginframe').hide();
+    });
+	  $('#loginframe').click(function() {
+        $('#loginqrcode').hide();
+        $('#loginframe').hide();
+    });
+    /*var val=$(window).height();
+	  var codeheight=$("#loginqrcode").height();
+    var topheight=(val-codeheight)/2;
+	  $('#loginqrcode').css('top',topheight);*/
+    jQuery.fn.center = function(loaded) {
+        var obj = this;
+        body_width = parseInt($(window).width());
+        body_height = parseInt($(window).height());
+        block_width = parseInt(obj.width());
+        block_height = parseInt(obj.height());
+
+        left_position = parseInt((body_width / 2) - (block_width / 2) + $(window).scrollLeft());
+        if (body_width < block_width) {
+            left_position = 0 + $(window).scrollLeft();
+        };
+
+        top_position = parseInt((body_height / 2) - (block_height / 2) + $(window).scrollTop());
+        if (body_height < block_height) {
+            top_position = 0 + $(window).scrollTop();
+        };
+
+        if (!loaded) {
+            obj.css({
+                'position': 'absolute'
+            });
+            obj.css({
+                'top': ($(window).height() - $('.loginqrcode').height()) * 0.2,
+                'left': left_position
+            });
+            $(window).bind('resize', function() {
+                obj.center(!loaded);
+            });
+            $(window).bind('scroll', function() {
+                obj.center(!loaded);
+            });
+        } else {
+            obj.stop();
+            obj.css({
+                'position': 'absolute'
+            });
+            obj.animate({
+                'top': top_position
+            }, 200, 'linear');
+        }
+    }
+    });
+  </script>
+</html>
