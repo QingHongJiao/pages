@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>提示</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0, user-scalable=no">
+</head>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+  }
+  .section {
+    margin: 0;
+    color: #222;
+    font-size: 12px;
+    padding: 70px 15px 20px;
+    text-align: center;
+  }
+  .ui-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #03081A;
+    letter-spacing: 2px;
+  }
+  .ui-notice {
+    font-size: 16px;
+    margin-bottom: 13px;
+    font-weight: normal;
+    color: #878B99;
+  }
+  .url {
+    padding: 5px 0;
+    word-break: break-all;
+    font-size: 14px;
+    color: #03081A;
+  }
+  #complain {
+    
+  }
+  .ui-icon {
+    display: inline-block;
+    width: 80px;
+    margin: 0 auto 10px;
+  }
+  .bottom {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    color: #B0B3BF;
+  }
+  .bottom-item {
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    color: #40A0FF;
+    text-decoration: none;
+  }
+  .ui-arrow {
+    float: right;
+    display: none;
+    width: 15px;
+    height: 15px;
+  }
+  .copy-btn {
+    display: none;
+    width: 80%;
+    margin: 13px auto 0;
+    padding: 10px 0;
+    text-align: center;
+    background: #00CAFC;
+    color: #fff;
+    border-radius: 6px;
+    outline: none;
+    border: none;
+  }
+  .copy-result {
+    display: none;
+    text-align: center;
+  }
+</style>
+<script>
+  var _mtac = {"senseQuery":1};
+  (function() {
+    var mta = document.createElement("script");
+    mta.src = "https://pingjs.qq.com/h5/stats.js?v2.0.4";
+    mta.setAttribute("name", "MTAH5");
+    mta.setAttribute("sid", "500630012");
+    mta.setAttribute("cid", "500684983");
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(mta, s);
+  })();
+</script>
+<body>
+  <section class="section">
+    <img class="ui-icon" src="https://3gimg.qq.com/tele_safe/static/tmp/ic_alert_blue.png"></img>
+    <p class="ui-title">当前网页非官方页面</p>
+    <div class="url" id="url"><img class="ui-arrow" src="https://3gimg.qq.com/tele_safe/static/tmp/ic_arrow.png" /></div>
+
+    <p class="ui-notice"  id="mobile" style="display: none">非官方页面，请勿输入QQ账号和密码，如需访问，请复制后使用浏览器访问</p>
+    <p class="ui-notice"  id="pc" style="display: none">非官方页面，请勿输入QQ账号和密码，如需访问，请复制后使用浏览器访问</p>
+    <button class="copy-btn" id="copy-btn">
+      复制链接
+    </button>
+    <div class="copy-result">复制成功</div>
+    <div class="bottom">
+      <div id="complain" class="bottom-item">申请恢复访问</div> |
+      <div id="guide" class="bottom-item">客服指引</div> |
+      <div id="rule" class="bottom-item">查看规则</div>
+    </div>
+  </section>
+</body>
+<script src="https://pc1.gtimg.com/js/jquery-1.8.2.min.js"></script>
+<script src="https://3gimg.qq.com/tele_safe/static/Lib/clipboard.min.js"></script>
+<script>
+var UA = navigator.userAgent
+if (UA.toLowerCase().indexOf('mobile') >= 0) {
+  $('#mobile').show()
+} else {
+  $('#pc').show()
+}
+function getParams(name){
+  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+  var r = window.location.search.substr(1).match(reg);
+  if (r != null) return decodeURIComponent(r[2]);
+  return '';
+}
+
+var url = getParams('pfurl')
+var showUrl = url
+if(url.length > 100) {
+  showUrl = url.slice(0, 30) + '...'
+  $('.ui-arrow').show()
+  $('#copy-btn').show()
+  $('.ui-arrow').on('click', function() {
+    $('#url').html('')
+    var coUrl = url.length > 200 ? url.slice(0, 200) + '...' : url
+    document.getElementById('url').appendChild(document.createTextNode(coUrl))
+  })
+
+  var clipboard = new ClipboardJS('#copy-btn', {
+    text: function(trigger) {
+      return url
+    }
+  })
+  clipboard.on('success', function(e) {
+    $('.copy-result').show()
+    setTimeout(function(){$('.copy-result').hide()}, 1000)
+  })
+  clipboard.on('error', function(e) {
+    MtaH5.clickStat('copyerror', {
+      'action': e.action,
+      'trigger': e.trigger
+    })
+  })
+}
+document.getElementById('url').appendChild(document.createTextNode(showUrl))
+
+$('body').on('copy', function(e) {
+   MtaH5.clickStat('copy',{'url':url})
+})
+
+// 申诉
+$('#complain').on('click', function() {
+  MtaH5 && MtaH5.clickStat("complain")
+  if (UA.toLowerCase().indexOf('mobile') >= 0) {
+    window.location.href = 'https://guanjia.qq.com/online_server/m_complain.html?url='+ escape(url)
+  } else {
+    window.location.href = 'https://guanjia.qq.com/online_server/complain_url.html?url='+ escape(url)
+  }
+})
+$('#rule').on('click', function() {
+  window.open('https://urlsec.qq.com/eviltype.html', '_self')
+})
+$('#guide').on('click', function() {
+  window.open('https://kf.qq.com/product/QQ.html', '_self')
+})
+
+</script>
+</html>
