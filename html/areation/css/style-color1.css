@@ -1,0 +1,82 @@
+/* Alternative colors */
+.page-nav li.active .icon ,
+.btn-round, .section .content .btns .btn,
+.section .content.with-clock .c-left .c-clock .tile-seconds,
+.section .content .c-illustr .img-middle .swipe-nav{
+    background: #2ac276;
+}
+.page-nav li:hover:not(.active) .icon ,
+.btn-round, .section .content .btns .btn:hover,
+.section .content.with-clock .c-left .c-clock .tile-minutes,
+.section-contact .content .c-illustr .img-middle .tiles-left h4,
+.site-footer .note .marked{
+	color: #2ac276;
+}
+.section-about .content .c-logo .icon, .section-register .content .c-logo .icon, .section-message .content .c-logo .icon, .section-contact .content .c-logo .icon {
+	color: #2ac276;
+}
+.section-contact .content .c-illustr .img-middle .tiles-left .socialnet li a{
+/*	background: #6e2ac2;*/
+	background: #2ac276;
+}
+.section-contact .content .c-illustr .img-middle .tiles-left .socialnet li:hover a{
+	background: #63eba7;
+}
+
+/* a section background color */
+.section-about,
+.section-contact{
+	background: rgba(0, 0, 0, 0.76);
+}
+
+/* Dot nav */
+
+#fp-nav.right{
+    right: 0px;
+    margin-right: 48px; 
+	position: absolute;
+}
+#fp-nav ul{
+	margin-top: -22px;
+}
+#fp-nav ul li, .fp-slidesNav ul li {
+    height: 7px;
+}
+#fp-nav span, .fp-slidesNav span{
+    border-color: #fff;
+	-webkit-transition: 0.3s;
+	transition: 0.3s;
+	width: 10px;
+	height: 10px;
+}
+#fp-nav ul li a.active span,
+#fp-nav ul li a:hover span,
+#fp-nav ul li a.active:hover span,
+#fp-nav ul li a span{
+	background: rgba(255, 255, 255, 0.34);
+	width: 16px;
+	border-radius: 0;
+	height: 1px;
+	left: auto;
+	right: 0;
+	top: 0;
+	margin-top: 0;
+	transition: 0.3s;
+}
+#fp-nav ul li a span:before{
+	position: absolute;
+	content: "";
+	top: -6px;
+	left: -2px;
+	right: -2px;
+	bottom: -6px;
+}
+#fp-nav ul li a:hover span{
+	width: 24px;
+	background: #fff;
+}
+#fp-nav ul li a.active span,
+#fp-nav ul li a.active:hover span{
+	width: 32px;
+	background: #fff;
+}

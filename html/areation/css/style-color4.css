@@ -1,0 +1,49 @@
+/* Alternative colors */
+.page-nav li.active .icon ,
+.btn-round, .section .content .btns .btn,
+.section .content.with-clock .c-left .c-clock .tile-seconds,
+.section .content .c-illustr .img-middle .swipe-nav{
+    background: #FF9800;
+}
+.page-nav li:hover:not(.active) .icon ,
+.btn-round, .section .content .btns .btn:hover,
+.section .content.with-clock .c-left .c-clock .tile-minutes,
+.section-contact .content .c-illustr .img-middle .tiles-left h4,
+.site-footer .note .marked{
+	color: #FF9800;
+}
+.section-about .content .c-logo .icon, .section-register .content .c-logo .icon, .section-message .content .c-logo .icon, .section-contact .content .c-logo .icon {
+	color: #FFF;
+}
+.section-contact .content .c-illustr .img-middle .tiles-left .socialnet li a{
+/*	background: #6e2ac2;*/
+	background: #383838;
+}
+.section-contact .content .c-illustr .img-middle .tiles-left .socialnet li:hover a{
+	background: #FF9800;
+}
+
+/* a section background color */
+.section-about{
+	background: #F57C00;
+}
+.section-register{
+	background: #2a2a2a;
+}
+.section-contact{
+	background: #EA5114;
+}
+.section-message{
+	background: #FF1616;
+}
+
+/* FP Nav */
+#fp-nav li .active span, .fp-slidesNav .active span{
+    background: #FF9800;
+}
+#fp-nav ul li a span, .fp-slidesNav ul li a span{
+	background: #fff;
+}
+#fp-nav ul{
+	margin-top: -40px;
+}

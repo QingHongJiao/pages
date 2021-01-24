@@ -1,0 +1,106 @@
+/* Alternative colors, white/black */
+
+
+
+/* Black color */
+.header-top .logo-wrapper .logo ,
+.header-top .site-nav li a ,
+.page-nav li a,
+.section .content .header h2,
+.section .content .header h3,
+.section .content .desc p,
+.section-contact .content .c-contact .desc,
+.section-contact .content .c-contact .desc li a,
+.s-footer a,
+.site-footer .note p{
+	color: #304149;
+}
+.section .content.with-clock .c-left .c-clock .tile-hours,
+.page-nav li .icon{
+	background: #304149;
+}
+.section .content .c-right:before{
+	background: #a8a8a8;
+}
+#fp-nav ul li a:hover span,  
+#fp-nav ul li a span,
+.s-footer a:after,
+.header-top .site-nav li a:after,
+.header-top .site-nav li.active a:after {
+	background: #3F51B5;
+}
+#fp-nav ul li a.active span,
+#fp-nav ul li a.active:hover span{
+	background: #304149;
+}
+.section .content .c-illustr .img-top,
+.section .content.with-clock .c-left .c-clock .tile-minutes{
+	background: #E4E4E4;
+}
+
+
+/* Theme color */
+.page-nav li.active .icon ,
+.btn-round, .section .content .btns .btn,
+.section .content.with-clock .c-left .c-clock .tile-seconds,
+.section .content .c-illustr .img-middle .swipe-nav{
+    background: #3F51B5;
+}
+.page-nav li:hover:not(.active) .icon ,
+.btn-round, .section .content .btns .btn:hover,
+.section .content.with-clock .c-left .c-clock .tile-minutes,
+.section-contact .content .c-illustr .img-middle .tiles-left h4,
+.site-footer .note .marked{
+	color: #3F51B5;
+}
+.section-about .content .c-logo .icon, .section-register .content .c-logo .icon, .section-message .content .c-logo .icon, .section-contact .content .c-logo .icon {
+	color: #3F51B5;
+}
+.section-contact .content .c-illustr .img-middle .tiles-left .socialnet li a{
+/*	background: #6e2ac2;*/
+	background: #3F51B5;
+}
+.section-contact .content .c-illustr .img-middle .tiles-left .socialnet li:hover a{
+	background: #63eba7;
+}
+.section .form label,
+.section .content .header h2,
+.header-top .site-nav li.separator{
+	color: #304149;
+}
+
+.section .form textarea, .section .form input{
+	border: 1px solid #3F51B5;
+	color: #304149;
+}
+.section-about .content .c-logo .icon, 
+.section-register .content .c-logo .icon, 
+.section-message .content .c-logo .icon, 
+.section-contact .content .c-logo .icon {
+    color: #E4E4E4;
+}
+
+.section .content .header h2{
+	position: relative;
+	margin-bottom: 32px;
+}
+.section .content .desc p,
+.section-contact .content .c-contact .desc {
+	font-weight: normal;
+}
+.section .content .header h2:before{
+	position: absolute;
+    height: 8px;
+    width: auto;
+    background: #E4E4E4;
+    left: 0;
+	width: 96px;
+/*    right: 96px;*/
+    bottom: -15px;
+    content: "";
+    z-index: -1;
+}
+/* a section background color */
+.section{
+	background: rgba(255, 255, 255, 0.8);
+}
